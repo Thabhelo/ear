@@ -1,0 +1,23 @@
+[project]
+name = "ear-api"
+version = "0.1.0"
+description = "FastAPI backend for Ear."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "pydantic-settings",
+  "uvicorn[standard]"
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx",
+  "pytest",
+  "ruff"
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

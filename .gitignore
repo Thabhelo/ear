@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+.next/
+out/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# environment
+.env
+.env.*
+!.env.example
+
+# local data
+*.sqlite
+*.db
+
+# build output
+dist/
+build/
+coverage/
+
+# system
+.DS_Store

@@ -1,0 +1,59 @@
+# Ear
+
+Ear is an on-demand human presence platform.
+
+The product starts as a single-provider service: customers connect to Thabhelo through a platform identity, never through personal phone numbers, email, WhatsApp, Instagram, or other private accounts.
+
+## Product
+
+Ear sells access to a real human who responds.
+
+- Just Listen: the customer talks, Ear listens, no advice unless requested.
+- Conversation: normal two-way conversation.
+- Deep Talk: life, relationships, dreams, failures, loneliness, and whatever is on the customer's mind.
+- Silent Company: almost no talking, just another person present.
+- Study Buddy: quiet co-working.
+- Game Mode: play games together.
+
+## Pricing
+
+One-off sessions are the acquisition funnel.
+
+- Quick Call: $2.99 for 3 minutes.
+- Standard Call: $6.99 for 25 minutes.
+- Long Call: $14.99 for 60 minutes.
+- Text Session: $1.99 for a text conversation session.
+- Priority Access: customers may add any bid amount to move higher in the queue.
+
+Subscription tiers sell access.
+
+- Text Friend: $4.99/month.
+- Friend: $19/month.
+- Close Friend: $29.99/month.
+- Always There: $49/month.
+
+## Architecture
+
+See `docs/architecture.md` for the low-level system diagram and data model.
+
+## Development
+
+This repository is a monorepo:
+
+- `apps/web`: Next.js frontend.
+- `apps/api`: FastAPI backend.
+- `docs`: product, architecture, and operating docs.
+- `infra`: local and cloud infrastructure notes.
+
+```bash
+npm install
+npm run dev:web
+```
+
+```bash
+cd apps/api
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+uvicorn app.main:app --reload
+```
