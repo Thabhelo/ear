@@ -1,13 +1,19 @@
-name = "ear-edge"
+name = "ear"
 main = "src/index.js"
 compatibility_date = "2024-06-01"
 
-# Set after `wrangler login`. Custom domains attach to these routes.
-routes = [
-  { pattern = "callsomeone.org/*", zone_name = "callsomeone.org" },
-  { pattern = "www.callsomeone.org/*", zone_name = "callsomeone.org" },
-  { pattern = "api.callsomeone.org/*", zone_name = "callsomeone.org" }
-]
+# Custom domains auto-create proxied DNS + TLS (no manual A/CNAME needed).
+[[routes]]
+pattern = "callsomeone.org"
+custom_domain = true
+
+[[routes]]
+pattern = "www.callsomeone.org"
+custom_domain = true
+
+[[routes]]
+pattern = "api.callsomeone.org"
+custom_domain = true
 
 [vars]
 WEB_ORIGIN = "pickup-web-4szghdmntq-uc.a.run.app"

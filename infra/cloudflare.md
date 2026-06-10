@@ -12,6 +12,8 @@ Production app stays on **Google Cloud Run**. Cloudflare sits in front with a sm
 
 Worker code: [`infra/cloudflare-proxy/`](./cloudflare-proxy/)
 
+`wrangler.toml` uses `name = "ear"` and `custom_domain = true` on each hostname so Cloudflare Git builds stay in sync with the dashboard.
+
 ## One-time setup
 
 ### 1. Log in to Cloudflare CLI
