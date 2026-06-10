@@ -38,6 +38,8 @@ See `docs/architecture.md` for the low-level system diagram and data model.
 
 ## Development
 
+**Local clone:** `/Users/thabhelo/ear` (use this path; `~/repos/ear` is no longer used).
+
 This repository is a monorepo:
 
 - `apps/web`: Next.js frontend deployed as `pickup-web`.

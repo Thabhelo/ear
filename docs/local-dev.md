@@ -1,5 +1,7 @@
 # Local development
 
+**Repository location:** `/Users/thabhelo/ear` (canonical local path; the old `~/repos/ear` path is obsolete).
+
 Run the web app and API in **two terminals**. Use Python **3.12+** (3.13 recommended) for the API.
 
 ## Prerequisites
@@ -10,12 +12,14 @@ Run the web app and API in **two terminals**. Use Python **3.12+** (3.13 recomme
   - `apps/api/.env` — API secrets and GCP/Firebase/Stripe/LiveKit settings (loaded via `app/settings.py`)
   - `apps/web/.env.local` — `NEXT_PUBLIC_*` Firebase client config and `NEXT_PUBLIC_API_BASE_URL` (use `http://127.0.0.1:8080` when the API runs on port 8080)
 
-If you moved the repo, delete and recreate `apps/api/.venv` so scripts point at the correct path (old venvs break `pip`/`uvicorn` shebangs).
+If you moved the repo (for example from `~/repos/ear` to `~/ear`), delete and recreate `apps/api/.venv` so scripts point at the correct path (old venvs break `pip`/`uvicorn` shebangs).
 
 ## Terminal 1 — Web (port 3100)
 
+From the repo root (`/Users/thabhelo/ear`):
+
 ```bash
-cd apps/web
+cd /Users/thabhelo/ear/apps/web
 npm install
 npm run dev -- -p 3100
 ```
@@ -32,7 +36,7 @@ kill <PID>   # or: kill -9 <PID> if it will not exit
 ## Terminal 2 — API (port 8080)
 
 ```bash
-cd apps/api
+cd /Users/thabhelo/ear/apps/api
 python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -e .
