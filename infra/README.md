@@ -20,3 +20,7 @@ Ear is designed to deploy on Google Cloud Run with managed external services.
 - Keep secrets outside source control.
 - Treat call recordings as sensitive protected assets.
 - Make the queue and call state observable for host operations.
+
+## LiveKit credentials
+
+See [cloud-run.md](./cloud-run.md) for Secret Manager secret names, the `set-livekit-secrets.sh` helper, and `pickup-api` env wiring.
