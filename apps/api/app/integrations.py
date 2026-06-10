@@ -73,7 +73,7 @@ class StripeClient:
         if not self.configured:
             return {
                 "configured": False,
-                "checkout_url": f"{settings.app_base_url}/account?plan={plan_key}&preview=1",
+                "checkout_url": f"{settings.app_base_url}/start?plan={plan_key}&activated=1",
                 "stripe_session_id": f"preview_subscription_{user_id}_{plan_key}",
             }
 

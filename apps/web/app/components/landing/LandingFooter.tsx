@@ -5,27 +5,25 @@ import Link from "next/link";
 
 const columns = [
   {
-    title: "Menu",
+    title: "Explore",
     links: [
-      { label: "Home", href: "/" },
       { label: "Modes", href: "/modes" },
       { label: "Pricing", href: "/pricing" },
-    ],
-  },
-  {
-    title: "Product",
-    links: [
-      { label: "Start", href: "/start" },
-      { label: "Queue", href: "/queue" },
       { label: "Safety", href: "/safety" },
     ],
   },
   {
-    title: "Others",
+    title: "Get started",
     links: [
-      { label: "Consent", href: "/consent" },
-      { label: "Safety Policy", href: "/safety" },
-      { label: "Get in line", href: "/start" },
+      { label: "Start a session", href: "/start" },
+      { label: "My queue", href: "/queue" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
     ],
   },
 ];
@@ -178,7 +176,7 @@ const LandingFooter = () => {
             y="225"
             textLength="1000"
             lengthAdjust="spacingAndGlyphs"
-            fill="rgba(0,0,0,0.07)"
+            fill="rgba(232,100,42,0.16)"
             style={{
               fontFamily: "'Bricolage Grotesque', sans-serif",
               fontSize: 320,

@@ -112,7 +112,7 @@ const FAQItem = ({ item, index, open, onToggle }: { item: FAQ; index: number; op
       }}
       onClick={onToggle}
     >
-      {/* Volumetric orange glow — masked by overflow:hidden */}
+      {/* Volumetric orange glow - masked by overflow:hidden */}
       <div
         aria-hidden
         style={{

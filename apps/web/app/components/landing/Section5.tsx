@@ -548,7 +548,7 @@ const Section5 = () => {
         </motion.div>
       </div>
 
-      {/* Second block — card on the LEFT */}
+      {/* Second block - card on the LEFT */}
       <div
         className="r-s5-grid r-pad-x"
         style={{
@@ -560,7 +560,7 @@ const Section5 = () => {
           gap: 80,
         }}
       >
-        {/* LEFT — queue card stack */}
+        {/* LEFT - queue card stack */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -578,7 +578,7 @@ const Section5 = () => {
               background: "linear-gradient(200deg, #E7F0FA 0%, #F4EFFB 50%, #FCE9DD 100%)",
             }}
           >
-            {/* back card — queue list */}
+            {/* back card - queue list */}
             <motion.div
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -623,7 +623,7 @@ const Section5 = () => {
               ))}
             </motion.div>
 
-            {/* front card — your bid */}
+            {/* front card - your bid */}
             <motion.div
               initial={{ opacity: 0, y: 80 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -668,7 +668,7 @@ const Section5 = () => {
           </div>
         </motion.div>
 
-        {/* RIGHT — text */}
+        {/* RIGHT - text */}
         <div style={{ flex: 1, maxWidth: 480, paddingTop: 20 }}>
           <motion.span
             initial={{ opacity: 0, x: 16 }}

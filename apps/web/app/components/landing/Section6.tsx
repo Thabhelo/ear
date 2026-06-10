@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type Review = {
@@ -77,7 +78,7 @@ const ReviewCard = ({ review, index }: { review: Review; index: number }) => {
           transition: "transform 0.35s ease",
         }}
       >
-        {/* Volumetric glow — sits beyond the top edge but masked by overflow:hidden */}
+        {/* Volumetric glow - sits beyond the top edge but masked by overflow:hidden */}
         <div
           aria-hidden
           style={{
@@ -251,6 +252,11 @@ const Section6 = () => {
     setOffset(snapped);
   };
 
+  const step = (direction: 1 | -1) => {
+    setAnimate(true);
+    setOffset((prev) => Math.round(prev / CARD_WIDTH) * CARD_WIDTH + direction * CARD_WIDTH);
+  };
+
   const headingWords = "Real people. Real presence.".split(" ");
 
   return (
@@ -313,6 +319,47 @@ const Section6 = () => {
 
       {/* Carousel */}
       <div style={{ position: "relative", width: "100%", overflow: "hidden" }}>
+        {/* Arrow controls */}
+        {([
+          { dir: -1 as const, side: { left: 28 }, Icon: ChevronLeft, label: "Previous testimonials" },
+          { dir: 1 as const, side: { right: 28 }, Icon: ChevronRight, label: "Next testimonials" },
+        ]).map(({ dir, side, Icon, label }) => (
+          <button
+            key={label}
+            type="button"
+            aria-label={label}
+            onClick={() => step(dir)}
+            className="flex items-center justify-center"
+            style={{
+              position: "absolute",
+              ...side,
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 12,
+              width: 48,
+              height: 48,
+              borderRadius: 9999,
+              border: "1px solid rgba(0,0,0,0.1)",
+              background: "rgba(255,255,255,0.85)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              boxShadow: "0 8px 24px rgba(15,23,42,0.1)",
+              color: "#111111",
+              cursor: "pointer",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-50%) scale(1.08)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(15,23,42,0.16)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(-50%) scale(1)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(15,23,42,0.1)";
+            }}
+          >
+            <Icon size={20} strokeWidth={2} />
+          </button>
+        ))}
         <div
           style={{
             position: "absolute",

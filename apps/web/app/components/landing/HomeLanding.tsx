@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronDown, Menu, X, Headphones, MessageCircle, Heart, Moon, BookOpen, Gamepad2, Home, Phone, User, Sun, Layers, LayoutGrid, Folder, GraduationCap } from "lucide-react";
-import Link from "next/link";
+import { Headphones, MessageCircle, Heart, Moon, BookOpen, Gamepad2, Home, Phone, User, Sun, Layers, LayoutGrid, Folder, GraduationCap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import LandingNav from "./LandingNav";
 import MagneticButton from "./MagneticButton";
 import Section4 from "./Section4";
 import Section5 from "./Section5";
@@ -92,220 +92,18 @@ const MODES_MARQUEE = [
   { label: "Priority Queue", Icon: Layers },
 ];
 
-const NavItem = ({
-  label,
-  href,
-  active,
-  hasArrow,
-}: {
-  label: string;
-  href: string;
-  active?: boolean;
-  hasArrow?: boolean;
-}) => {
-  return (
-    <Link
-      href={href}
-      className="flex items-center"
-      style={{
-        gap: 4,
-        fontFamily: "'Bricolage Grotesque', sans-serif",
-        fontSize: 14,
-        fontWeight: active ? 500 : 400,
-        color: active ? "#111111" : "rgba(0,0,0,0.65)",
-        padding: "6px 12px",
-        borderRadius: 8,
-        background: active ? "rgba(0,0,0,0.06)" : "transparent",
-        cursor: "pointer",
-        border: "none",
-        textDecoration: "none",
-        transition: "background 0.2s, color 0.2s",
-      }}
-      onMouseEnter={(e) => {
-        if (!active) {
-          e.currentTarget.style.background = "rgba(0,0,0,0.04)";
-          e.currentTarget.style.color = "rgba(0,0,0,0.9)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!active) {
-          e.currentTarget.style.background = "transparent";
-          e.currentTarget.style.color = "rgba(0,0,0,0.65)";
-        }
-      }}
-    >
-      {label}
-      {hasArrow && <ChevronDown size={13} color="rgba(0,0,0,0.65)" />}
-    </Link>
-  );
-};
-
 const HomeLanding = () => {
   const router = useRouter();
   const block1 = useInView<HTMLDivElement>(0.2);
   const block2 = useInView<HTMLDivElement>(0.2);
   const block3 = useInView<HTMLDivElement>(0.2);
   const block4 = useInView<HTMLDivElement>(0.2);
-  const [mobileOpen, setMobileOpen] = useState(false);
   return (
     <div
       className="relative min-h-screen overflow-hidden"
       style={{ background: "linear-gradient(179deg, #EDF0F5 -43.55%, #FFFFFF 90.05%)" }}
     >
-      {/* Navbar */}
-      <nav
-        className="r-nav fixed z-50 flex items-center justify-between"
-        style={{
-          top: 24,
-          left: 24,
-          right: 24,
-          padding: "12px 14px",
-          borderRadius: 48,
-          border: "1px solid rgba(0,0,0,0.07)",
-          background: "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(57px)",
-          WebkitBackdropFilter: "blur(57px)",
-          boxShadow: "0 12px 32px rgba(15,23,42,0.06)",
-          overflow: "hidden",
-        }}
-      >
-        <div className="flex items-center" style={{ position: "relative", zIndex: 1 }}>
-          <Link
-            href="/"
-            className="r-nav-logo flex items-center"
-            style={{
-              marginRight: 20,
-              paddingLeft: 12,
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontSize: 24,
-              fontWeight: 500,
-              letterSpacing: "-0.8px",
-              color: "#111111",
-              textDecoration: "none",
-            }}
-          >
-            Ear
-          </Link>
-          <div
-            className="r-nav-divider"
-            style={{
-              width: 1,
-              height: 20,
-              background: "rgba(0,0,0,0.12)",
-              marginRight: 20,
-            }}
-          />
-          <div className="r-nav-links flex items-center" style={{ gap: 4 }}>
-            <NavItem label="Home" href="/" active />
-            <NavItem label="Modes" href="/modes" hasArrow />
-            <NavItem label="Pricing" href="/pricing" />
-            <NavItem label="Safety" href="/safety" />
-            <NavItem label="Queue" href="/queue" />
-          </div>
-        </div>
-
-        <div className="flex items-center" style={{ gap: 10, position: "relative", zIndex: 1 }}>
-          <button
-            className="r-nav-lang flex items-center"
-            style={{
-              gap: 6,
-              padding: "6px 10px",
-              borderRadius: 8,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.04)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-          >
-            <span
-              style={{
-                fontFamily: "'Inter Tight', sans-serif",
-                fontSize: 14,
-                fontWeight: 400,
-                color: "rgba(0,0,0,0.65)",
-              }}
-            >
-              English
-            </span>
-          </button>
-
-          <MagneticButton
-            circleColor="rgba(0,0,0,0.05)"
-            circleSize={200}
-            onClick={() => router.push("/pricing")}
-            style={{
-              display: "flex",
-              padding: "10px 16px",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 50,
-              border: "1px solid rgba(0,0,0,0.08)",
-              background: "rgba(255,255,255,0.7)",
-              boxShadow: "0 8px 12px 0 rgba(15,23,42,0.05)",
-              backdropFilter: "blur(17px)",
-              WebkitBackdropFilter: "blur(17px)",
-              color: "#111111",
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontSize: 14,
-              fontWeight: 500,
-              cursor: "pointer",
-            }}
-          >
-            See pricing
-          </MagneticButton>
-
-          <MagneticButton
-            circleColor="rgba(255,255,255,0.15)"
-            circleSize={200}
-            onClick={() => router.push("/start")}
-            style={{
-              borderRadius: 9999,
-              background: "#111111",
-              color: "#FFFFFF",
-              border: "none",
-              fontFamily: "'Bricolage Grotesque', sans-serif",
-              fontSize: 14,
-              fontWeight: 600,
-              padding: "10px 16px",
-              cursor: "pointer",
-            }}
-          >
-            <Phone size={14} />
-            <span className="r-nav-start-text">Start now</span>
-          </MagneticButton>
-
-          <button
-            type="button"
-            aria-label="Open menu"
-            onClick={() => setMobileOpen((v) => !v)}
-            className="r-mobile-menu-btn items-center justify-center"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 9999,
-              border: "1px solid rgba(0,0,0,0.12)",
-              background: "rgba(255,255,255,0.8)",
-              color: "#111111",
-              cursor: "pointer",
-            }}
-          >
-            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-      </nav>
-
-      {/* Mobile drawer */}
-      <div className={`r-mobile-menu ${mobileOpen ? "open" : ""}`} role="menu">
-        <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
-        <Link href="/modes" onClick={() => setMobileOpen(false)}>Modes</Link>
-        <Link href="/pricing" onClick={() => setMobileOpen(false)}>Pricing</Link>
-        <Link href="/safety" onClick={() => setMobileOpen(false)}>Safety</Link>
-        <Link href="/queue" onClick={() => setMobileOpen(false)}>Queue</Link>
-        <Link href="/start" onClick={() => setMobileOpen(false)}>Start now</Link>
-      </div>
+      <LandingNav active="/" />
 
       {/* Hero section */}
       <section className="relative w-full" style={{ overflow: "hidden" }}>
@@ -534,7 +332,7 @@ const HomeLanding = () => {
             </MagneticButton>
           </motion.div>
 
-          {/* Hero product shot — mock call dashboard */}
+          {/* Hero product shot - mock call dashboard */}
           <motion.div
             initial={{ opacity: 0, y: 60, filter: "blur(8px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -569,7 +367,7 @@ const HomeLanding = () => {
                 <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#FFCF5F" }} />
                 <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#67D243" }} />
                 <span style={{ marginLeft: 12, fontFamily: "'Inter Tight', sans-serif", fontSize: 12, color: "rgba(0,0,0,0.4)" }}>
-                  ear — live session
+                  ear · live session
                 </span>
                 <span
                   style={{
@@ -770,7 +568,7 @@ const HomeLanding = () => {
         </div>
       </section>
 
-      {/* Section 3 — How Ear works */}
+      {/* Section 3 - How Ear works */}
       <section
         className="r-section-pad r-pad-x"
         style={{
@@ -835,7 +633,7 @@ const HomeLanding = () => {
           }}
           className="r-grid-3"
         >
-          {/* Block 1 — Text sessions */}
+          {/* Block 1 - Text sessions */}
           <div ref={block1.ref} className="r-card-small">
             <div
               style={{
@@ -970,7 +768,7 @@ const HomeLanding = () => {
                     color: "rgba(0,0,0,0.35)",
                   }}
                 >
-                  Hey, rough day? No pressure to explain anything. I&apos;m here — tell me as much or as little as you want.
+                  Hey, rough day? No pressure to explain anything. I&apos;m here. Tell me as much or as little as you want.
                 </p>
                 <div
                   style={{
@@ -1033,7 +831,7 @@ const HomeLanding = () => {
             </div>
           </div>
 
-          {/* Block 2 — Priority queue dashboard */}
+          {/* Block 2 - Priority queue dashboard */}
           <div ref={block2.ref} className="r-card-large">
             <div
               style={{
@@ -1318,7 +1116,7 @@ const HomeLanding = () => {
           </div>
         </div>
 
-        {/* Bottom row — Sessions (wide left) + Safety (narrow right) */}
+        {/* Bottom row - Sessions (wide left) + Safety (narrow right) */}
         <div
           style={{
             maxWidth: 1436,
@@ -1330,7 +1128,7 @@ const HomeLanding = () => {
           }}
           className="r-grid-3"
         >
-          {/* Block 3 — Sessions */}
+          {/* Block 3 - Sessions */}
           <div ref={block3.ref} className="r-card-large">
             <div
               style={{
@@ -1635,7 +1433,7 @@ const HomeLanding = () => {
             </div>
           </div>
 
-          {/* Block 4 — Safety / consent */}
+          {/* Block 4 - Safety / consent */}
           <div ref={block4.ref} className="r-card-small">
             <div
               style={{

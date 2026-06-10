@@ -46,7 +46,7 @@ main {
 }
 
 section {
-  margin: 84px 0;
+  margin: 0;
 }
 
 .topbar {
@@ -613,8 +613,7 @@ html, body { overflow-x: hidden; }
 @media (max-width: 640px) {
   .r-nav {
     top: 12px !important;
-    left: 12px !important;
-    right: 12px !important;
+    width: calc(100% - 24px) !important;
     padding: 8px 10px !important;
     border-radius: 32px !important;
   }
@@ -729,4 +728,20 @@ html, body { overflow-x: hidden; }
 @media (max-width: 640px) {
   .r-s7-h2 { font-size: 34px !important; letter-spacing: -1px !important; }
   .r-s7-list { padding: 0 16px !important; }
+}
+
+/* ---------- Inner-page kit ---------- */
+.k-grid { display: grid; gap: 16px; }
+.k-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.k-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.k-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.k-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.k-row-center { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+@media (max-width: 1000px) {
+  .k-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .k-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .k-grid-2, .k-grid-3, .k-grid-4 { grid-template-columns: 1fr; }
 }
