@@ -45,15 +45,4 @@ This repository is a monorepo:
 - `docs`: product, architecture, and operating docs.
 - `infra`: local and cloud infrastructure notes.
 
-```bash
-npm install
-npm run dev:web
-```
-
-```bash
-cd apps/api
-python -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-uvicorn app.main:app --reload
-```
+See **[docs/local-dev.md](docs/local-dev.md)** for exact commands (ports 3100 / 8080), `.env` setup, and Firebase authorized domains.
