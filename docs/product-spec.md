@@ -30,7 +30,7 @@ This avoids stranger-to-stranger moderation, harassment, scams, catfishing, safe
 
 ### Just Listen
 
-The customer talks. Ear listens. No advice unless requested.
+The customer talks. The host listens. No advice unless requested.
 
 ### Conversation
 
@@ -61,7 +61,7 @@ One-off sessions are the acquisition funnel.
 | Quick Call | $2.99 | 3 minutes |
 | Standard Call | $6.99 | 25 minutes |
 | Long Call | $14.99 | 60 minutes |
-| Text Session | $1.99 | Text conversation session |
+| Text once | $6.99 | Text-only access for the day |
 
 ## Priority Access
 

@@ -4,10 +4,10 @@ Ear is designed to deploy on Google Cloud Run with managed external services.
 
 ## Services
 
-- `ear-web`: Next.js frontend.
-- `ear-api`: FastAPI backend.
+- `pickup-web`: Next.js frontend.
+- `pickup-api`: FastAPI backend.
 - Firebase Authentication for identity.
-- Supabase PostgreSQL for relational application state.
+- Cloud Firestore for application state.
 - Stripe for one-off payments, bids, subscriptions, and reinstatement review fees.
 - LiveKit or Daily.co for calls.
 - Google Cloud Storage for recordings.

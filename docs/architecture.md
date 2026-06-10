@@ -14,7 +14,7 @@ flowchart TD
   Stripe --> Webhook[Stripe Webhook Endpoint]
   Webhook --> API
 
-  API --> DB[(Supabase PostgreSQL)]
+  API --> DB[(Cloud Firestore)]
   API --> Queue[Priority Queue Service]
   Queue --> DB
 
@@ -223,7 +223,7 @@ erDiagram
 - Frontend: Next.js.
 - Backend: FastAPI.
 - Auth: Firebase Authentication.
-- Database: Supabase PostgreSQL.
+- Database: Cloud Firestore.
 - Payments: Stripe.
 - Calls: LiveKit or Daily.co.
 - Storage: Google Cloud Storage.

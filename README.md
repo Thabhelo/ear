@@ -8,7 +8,7 @@ The product starts as a single-provider service: customers connect to Thabhelo t
 
 Ear sells access to a real human who responds.
 
-- Just Listen: the customer talks, Ear listens, no advice unless requested.
+- Just Listen: the customer talks, the host listens, no advice unless requested.
 - Conversation: normal two-way conversation.
 - Deep Talk: life, relationships, dreams, failures, loneliness, and whatever is on the customer's mind.
 - Silent Company: almost no talking, just another person present.
@@ -22,7 +22,7 @@ One-off sessions are the acquisition funnel.
 - Quick Call: $2.99 for 3 minutes.
 - Standard Call: $6.99 for 25 minutes.
 - Long Call: $14.99 for 60 minutes.
-- Text Session: $1.99 for a text conversation session.
+- Text once: $6.99/day.
 - Priority Access: customers may add any bid amount to move higher in the queue.
 
 Subscription tiers sell access.
@@ -40,8 +40,8 @@ See `docs/architecture.md` for the low-level system diagram and data model.
 
 This repository is a monorepo:
 
-- `apps/web`: Next.js frontend.
-- `apps/api`: FastAPI backend.
+- `apps/web`: Next.js frontend deployed as `pickup-web`.
+- `apps/api`: FastAPI backend deployed as `pickup-api`.
 - `docs`: product, architecture, and operating docs.
 - `infra`: local and cloud infrastructure notes.
 
