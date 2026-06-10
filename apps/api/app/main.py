@@ -13,6 +13,7 @@ from app.models import (
     ConsentRecordCreate,
     CreateRoomRequest,
     EndCallRequest,
+    HostJoinRoomRequest,
     HostStatusRequest,
     MessageCreate,
     QueueJoinRequest,
@@ -226,6 +227,42 @@ def create_room(payload: CreateRoomRequest, user_id: str = Depends(current_user_
     room = calls_client.create_room(session_id=payload.session_id, user_id=user_id)
     store.update("sessions", payload.session_id, {"status": "active", "started_at": utc_now()})
     return {"session": session, "room": room}
+
+
+@app.post("/host/join-room", status_code=status.HTTP_201_CREATED)
+def host_join_room(payload: HostJoinRoomRequest) -> dict[str, object]:
+    try:
+        session = store.get("sessions", payload.session_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Session not found.") from None
+    room = calls_client.create_room(
+        session_id=payload.session_id,
+        user_id=settings.host_user_id,
+        role="host",
+    )
+    if session.get("status") not in {"active", "consent_pending"}:
+        store.update("sessions", payload.session_id, {"status": "active", "started_at": utc_now()})
+    return {"session": session, "room": room}
+
+
+@app.post("/host/end-call")
+def host_end_call(payload: EndCallRequest) -> dict[str, str]:
+    try:
+        store.get("sessions", payload.session_id)
+        store.update(
+            "sessions",
+            payload.session_id,
+            {
+                "status": "ended",
+                "ended_at": utc_now(),
+                "ended_by": payload.ended_by,
+                "end_reason": payload.reason,
+                "refund_requested": payload.refund_requested,
+            },
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Session not found.") from None
+    return {"status": "ended", "session_id": payload.session_id}
 
 
 @app.post("/calls/end")

@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gavel, RefreshCw, Users } from "lucide-react";
+import { Gavel, Phone, RefreshCw, Users } from "lucide-react";
 import { useState } from "react";
+import { LiveKitCallSession, MuteToggle, useDisconnectRoom } from "../call/LiveKitCallSession";
 import { AuthRedirectGate } from "../components/auth/AuthGate";
 import {
   Chip,
@@ -22,6 +23,73 @@ type QueueEntry = {
   mode: string;
   priority_score: number;
 };
+
+type RoomPayload = {
+  livekit_url: string | null;
+  token: string | null;
+  configured: boolean;
+};
+
+type HostCallState = {
+  sessionId: string;
+  token: string;
+  serverUrl: string;
+  connection: "connecting" | "connected" | "disconnected";
+};
+
+function HostCallPanel({
+  call,
+  busy,
+  onLeave
+}: {
+  call: HostCallState;
+  busy: boolean;
+  onLeave: () => void;
+}) {
+  const disconnect = useDisconnectRoom();
+
+  function handleLeave() {
+    disconnect();
+    onLeave();
+  }
+
+  return (
+    <div className="flex items-center justify-between" style={{ gap: 12, flexWrap: "wrap" }}>
+      <div>
+        <p style={{ fontFamily: fontHeading, fontSize: 15, fontWeight: 500, color: "#111111", margin: "0 0 4px" }}>
+          {call.connection === "connected"
+            ? "You're in the room."
+            : call.connection === "connecting"
+              ? "Connecting to session…"
+              : "Call disconnected."}
+        </p>
+        <p style={{ fontFamily: fontBody, fontSize: 12.5, color: "rgba(0,0,0,0.5)", margin: 0 }}>
+          session {call.sessionId}
+        </p>
+      </div>
+      <div className="flex items-center" style={{ gap: 10 }}>
+        {call.connection === "connected" ? <MuteToggle /> : null}
+        <button
+          type="button"
+          onClick={handleLeave}
+          style={{
+            borderRadius: 9999,
+            border: "1px solid rgba(214,69,93,0.4)",
+            background: "rgba(214,69,93,0.06)",
+            color: "#D6455D",
+            fontFamily: fontBody,
+            fontSize: 13.5,
+            fontWeight: 500,
+            padding: "10px 18px",
+            cursor: busy ? "wait" : "pointer"
+          }}
+        >
+          Leave call
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -53,6 +121,8 @@ export function HostDashboard() {
   const [banId, setBanId] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [activeCall, setActiveCall] = useState<HostCallState | null>(null);
+  const [callBusy, setCallBusy] = useState(false);
 
   async function run(action: () => Promise<void>) {
     setError("");
@@ -104,6 +174,48 @@ export function HostDashboard() {
       setStatus("Appeal review created.");
     });
 
+  const joinSession = (sessionId: string) =>
+    run(async () => {
+      setCallBusy(true);
+      try {
+        const response = await apiPost<{ room: RoomPayload }>("/host/join-room", {
+          session_id: sessionId
+        });
+        const { room } = response;
+        if (!room.configured || !room.token || !room.livekit_url) {
+          setStatus("Session is ready, but LiveKit is not configured yet.");
+          return;
+        }
+        setActiveCall({
+          sessionId,
+          token: room.token,
+          serverUrl: room.livekit_url,
+          connection: "connecting"
+        });
+        setStatus(`Joining session ${sessionId}.`);
+      } finally {
+        setCallBusy(false);
+      }
+    });
+
+  const leaveSession = () =>
+    run(async () => {
+      if (!activeCall) return;
+      setCallBusy(true);
+      try {
+        await apiPost("/host/end-call", {
+          session_id: activeCall.sessionId,
+          ended_by: "host",
+          reason: "host_exit",
+          refund_requested: false
+        });
+        setActiveCall(null);
+        setStatus("You left the call.");
+      } finally {
+        setCallBusy(false);
+      }
+    });
+
   return (
     <AuthRedirectGate mode="signed-in-only">
     <PageShell maxWidth={920}>
@@ -114,6 +226,35 @@ export function HostDashboard() {
       />
 
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {activeCall ? (
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
+            <Surface style={{ padding: 24 }}>
+              <div className="flex items-center" style={{ gap: 8, marginBottom: 14 }}>
+                <Phone size={17} color="#1F9D63" />
+                <h3 style={{ fontFamily: fontHeading, fontSize: 18, fontWeight: 450, color: "#111111", margin: 0 }}>
+                  Active call
+                </h3>
+              </div>
+              <LiveKitCallSession
+                token={activeCall.token}
+                serverUrl={activeCall.serverUrl}
+                onConnected={() =>
+                  setActiveCall((current) =>
+                    current ? { ...current, connection: "connected" } : current
+                  )
+                }
+                onDisconnected={() =>
+                  setActiveCall((current) =>
+                    current ? { ...current, connection: "disconnected" } : current
+                  )
+                }
+              >
+                <HostCallPanel call={activeCall} busy={callBusy} onLeave={leaveSession} />
+              </LiveKitCallSession>
+            </Surface>
+          </motion.div>
+        ) : null}
+
         {/* Availability */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }}>
           <Surface style={{ padding: 28 }}>
@@ -199,11 +340,30 @@ export function HostDashboard() {
                         score {entry.priority_score}
                       </span>
                     </div>
-                    <p style={{ fontFamily: fontBody, fontSize: 12.5, color: "rgba(0,0,0,0.5)", margin: 0 }}>
+                    <p style={{ fontFamily: fontBody, fontSize: 12.5, color: "rgba(0,0,0,0.5)", margin: "0 0 12px" }}>
                       user {entry.user_id}
                       <br />
                       session {entry.session_id}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => joinSession(entry.session_id)}
+                      disabled={callBusy || activeCall !== null}
+                      style={{
+                        borderRadius: 9999,
+                        border: "none",
+                        background: "#111111",
+                        color: "#FFFFFF",
+                        fontFamily: fontBody,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        padding: "9px 16px",
+                        cursor: callBusy || activeCall !== null ? "not-allowed" : "pointer",
+                        opacity: callBusy || activeCall !== null ? 0.6 : 1
+                      }}
+                    >
+                      Join call
+                    </button>
                   </div>
                 ))}
               </div>

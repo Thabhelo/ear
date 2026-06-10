@@ -1,12 +1,12 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, Literal
 
 import stripe
 from google.cloud import storage, tasks_v2
+from livekit import api as livekit_api
 
 from app.firestore_store import utc_now
 from app.settings import settings
-
 
 ONE_OFF_PRODUCTS = {
     "text_once": {"name": "Text once", "amount_cents": 699, "duration_minutes": 0, "type": "text"},
@@ -113,14 +113,60 @@ class CallsClient:
             ]
         )
 
-    def create_room(self, *, session_id: str, user_id: str) -> dict[str, Any]:
-        # Token signing is added when the LiveKit/Daily secret is installed.
+    def _room_name(self, session_id: str) -> str:
+        return f"pickup-{session_id}"
+
+    def _access_token(
+        self,
+        *,
+        session_id: str,
+        identity: str,
+        display_name: str,
+        role: Literal["caller", "host"],
+    ) -> str:
+        room_name = self._room_name(session_id)
+        grants = livekit_api.VideoGrants(
+            room_join=True,
+            room=room_name,
+            can_publish=True,
+            can_subscribe=True,
+            can_publish_sources=["microphone"],
+            room_admin=role == "host",
+        )
+        return (
+            livekit_api.AccessToken(settings.livekit_api_key, settings.livekit_api_secret)
+            .with_identity(identity)
+            .with_name(display_name)
+            .with_grants(grants)
+            .to_jwt()
+        )
+
+    def create_room(
+        self,
+        *,
+        session_id: str,
+        user_id: str,
+        role: Literal["caller", "host"] = "caller",
+    ) -> dict[str, Any]:
+        room_name = self._room_name(session_id)
+        token = None
+        if self.configured:
+            identity = settings.host_user_id if role == "host" else user_id
+            display_name = "Host" if role == "host" else "Guest"
+            token = self._access_token(
+                session_id=session_id,
+                identity=identity,
+                display_name=display_name,
+                role=role,
+            )
+
         return {
             "configured": self.configured,
             "provider": "livekit",
-            "room_name": f"pickup-{session_id}",
+            "livekit_url": settings.livekit_url,
+            "room_name": room_name,
             "join_url": f"{settings.app_base_url}/call?session={session_id}",
-            "token": None if not self.configured else f"token-required-for-{user_id}",
+            "token": token,
         }
 
 

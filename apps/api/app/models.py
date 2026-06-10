@@ -110,6 +110,10 @@ class CreateRoomRequest(BaseModel):
     consent_given: bool
 
 
+class HostJoinRoomRequest(BaseModel):
+    session_id: str = Field(min_length=1)
+
+
 class EndCallRequest(BaseModel):
     session_id: str = Field(min_length=1)
     ended_by: str = Field(pattern="^(host|user|system)$")

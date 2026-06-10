@@ -9,6 +9,7 @@ dependencies = [
   "google-cloud-firestore",
   "google-cloud-storage",
   "google-cloud-tasks",
+  "livekit-api",
   "pydantic-settings",
   "stripe",
   "uvicorn[standard]"
