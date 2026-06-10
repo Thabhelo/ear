@@ -33,7 +33,7 @@ function SignUpContent() {
     <AuthRedirectGate mode="guest-only" fallback={returnUrl}>
       <AuthForm
         title="Create your account."
-        sub="One account for sessions, queue, and calls. Google or email — your choice."
+        sub="One account for sessions, queue, and calls. Google or email, your choice."
         submitLabel="Create account"
         showName
         googleLabel="Sign up with Google"
@@ -62,7 +62,7 @@ export default function SignUpPage() {
       <PageHero
         eyebrow="Sign up"
         title="Join Ear."
-        sub="Takes under a minute. No spam — just a way to save your place in line."
+        sub="Takes under a minute. No spam, just a way to save your place in line."
       />
       <motion.div
         initial={{ opacity: 0, y: 20 }}

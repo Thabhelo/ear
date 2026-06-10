@@ -185,7 +185,7 @@ export function CallFlow() {
     stage === "ready"
       ? "Tap below and we'll open your room. Your purchased time starts when both sides are in."
       : stage === "connecting"
-        ? "Hang tight — we're getting your line ready."
+        ? "Hang tight, we're getting your line ready."
         : stage === "connected"
           ? "If the conversation runs past your time on a quiet night, it may keep going, on the house."
           : stage === "disconnected"

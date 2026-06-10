@@ -151,7 +151,7 @@ function AccountContent() {
               {auth.hasPassword
                 ? "Update the password you use with email sign-in."
                 : auth.usesGoogle
-                  ? "You signed up with Google. That's still your main way in — add a password only if you want email sign-in too."
+                  ? "You signed up with Google. That's still your main way in. Add a password only if you want email sign-in too."
                   : "Set a password for email sign-in."}
             </p>
 
@@ -301,7 +301,7 @@ export default function AccountPage() {
       <PageHero
         eyebrow="Account"
         title="Your settings."
-        sub="Manage how you sign in. Nothing fancy — just what you need."
+        sub="Manage how you sign in. Nothing fancy, just what you need."
       />
       <motion.div
         initial={{ opacity: 0, y: 20 }}

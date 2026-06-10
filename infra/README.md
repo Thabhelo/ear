@@ -24,3 +24,7 @@ Ear is designed to deploy on Google Cloud Run with managed external services.
 ## LiveKit credentials
 
 See [cloud-run.md](./cloud-run.md) for Secret Manager secret names, the `set-livekit-secrets.sh` helper, and `pickup-api` env wiring.
+
+## GitHub Actions
+
+See [github-actions.md](./github-actions.md) for auto-deploy on push to `main`.

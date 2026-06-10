@@ -9,8 +9,8 @@ Run the web app and API in **two terminals**. Use Python **3.12+** (3.13 recomme
 - Node.js and npm (monorepo root or `apps/web`)
 - Python 3.13 (`brew install python@3.13` or use `/opt/homebrew/bin/python3.13`)
 - Copy or create env files (never commit them):
-  - `apps/api/.env` — API secrets and GCP/Firebase/Stripe/LiveKit settings (loaded via `app/settings.py`)
-  - `apps/web/.env.local` — `NEXT_PUBLIC_*` Firebase client config and `NEXT_PUBLIC_API_BASE_URL` (use `http://127.0.0.1:8080` when the API runs on port 8080)
+  - `apps/api/.env`: API secrets and GCP/Firebase/Stripe/LiveKit settings (loaded via `app/settings.py`)
+  - `apps/web/.env.local`: `NEXT_PUBLIC_*` Firebase client config and `NEXT_PUBLIC_API_BASE_URL` (use `http://127.0.0.1:8080` when the API runs on port 8080)
 
 If you moved the repo (for example from `~/repos/ear` to `~/ear`), delete and recreate `apps/api/.venv` so scripts point at the correct path (old venvs break `pip`/`uvicorn` shebangs).
 
@@ -27,7 +27,7 @@ cd /Users/thabhelo/ear/apps/web
 npm run dev:webpack -- -p 3100
 ```
 
-## Terminal 1 — Web (port 3100)
+## Terminal 1: Web (port 3100)
 
 From the repo root (`/Users/thabhelo/ear`):
 
@@ -46,7 +46,7 @@ lsof -i :3100
 kill <PID>   # or: kill -9 <PID> if it will not exit
 ```
 
-## Terminal 2 — API (port 8080)
+## Terminal 2: API (port 8080)
 
 ```bash
 cd /Users/thabhelo/ear/apps/api

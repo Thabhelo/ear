@@ -33,7 +33,7 @@ function SignInContent() {
     <AuthRedirectGate mode="guest-only" fallback={returnUrl}>
       <AuthForm
         title="Welcome back."
-        sub="Sign in to pick up where you left off — queue, payment, or your next call."
+        sub="Sign in to pick up where you left off: queue, payment, or your next call."
         submitLabel="Sign in"
         googleLabel="Continue with Google"
         alternate={
@@ -66,7 +66,7 @@ export default function SignInPage() {
       <PageHero
         eyebrow="Sign in"
         title="Good to see you."
-        sub="Use Google or your email — whichever you signed up with."
+        sub="Use Google or your email, whichever you signed up with."
       />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
