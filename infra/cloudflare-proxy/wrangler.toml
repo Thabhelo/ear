@@ -1,0 +1,14 @@
+name = "ear-edge"
+main = "src/index.js"
+compatibility_date = "2024-06-01"
+
+# Set after `wrangler login`. Custom domains attach to these routes.
+routes = [
+  { pattern = "callsomeone.org/*", zone_name = "callsomeone.org" },
+  { pattern = "www.callsomeone.org/*", zone_name = "callsomeone.org" },
+  { pattern = "api.callsomeone.org/*", zone_name = "callsomeone.org" }
+]
+
+[vars]
+WEB_ORIGIN = "pickup-web-4szghdmntq-uc.a.run.app"
+API_ORIGIN = "pickup-api-4szghdmntq-uc.a.run.app"

@@ -28,3 +28,7 @@ See [cloud-run.md](./cloud-run.md) for Secret Manager secret names, the `set-liv
 ## GitHub Actions
 
 See [github-actions.md](./github-actions.md) for auto-deploy on push to `main`.
+
+## Cloudflare (callsomeone.org)
+
+See [cloudflare.md](./cloudflare.md) for domain + Worker proxy setup in front of Cloud Run.
