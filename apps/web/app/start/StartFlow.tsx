@@ -1,14 +1,25 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { ArrowRight, Check, Clock, MessageSquareText, Phone, Zap } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { apiPost } from "../lib/api";
-import { modes, oneOffs, subscriptions } from "../lib/catalog";
+import MagneticButton from "../components/landing/MagneticButton";
+import { ModeGlyph } from "../components/landing/modeMeta";
 import {
-  firebaseConfigured,
-  onFirebaseUserChanged,
-  signInWithGoogle,
-  signOutCurrentUser
-} from "../lib/firebase";
+  Chip,
+  Note,
+  PageHero,
+  PageShell,
+  Surface,
+  fontBody,
+  fontHeading
+} from "../components/landing/PageShell";
+import { apiPost } from "../lib/api";
+import { redirectToSignIn } from "../lib/authRedirects";
+import { modes, oneOffs, subscriptions, type ModeId, type OneOffId } from "../lib/catalog";
+import { useAuth } from "../lib/useAuth";
 
 type CheckoutResponse = {
   checkout_url: string;
@@ -16,200 +27,474 @@ type CheckoutResponse = {
   configured: boolean;
 };
 
+const BID_OPTIONS = [
+  { cents: 0, label: "No thanks" },
+  { cents: 200, label: "+$2" },
+  { cents: 500, label: "+$5" },
+  { cents: 1000, label: "+$10" }
+];
+
+function isModeId(value: string | null): value is ModeId {
+  return modes.some((m) => m.id === value);
+}
+
+function isOneOffId(value: string | null): value is OneOffId {
+  return oneOffs.some((o) => o.id === value);
+}
+
+function dollars(cents: number): string {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+function StepLabel({ index, children }: { index: string; children: string }) {
+  return (
+    <div className="flex items-center" style={{ gap: 10, margin: "0 0 12px" }}>
+      <span
+        style={{
+          fontFamily: fontBody,
+          fontSize: 12,
+          fontWeight: 500,
+          color: "rgba(0,0,0,0.35)",
+          letterSpacing: "1px"
+        }}
+      >
+        {index}
+      </span>
+      <span
+        style={{
+          fontFamily: fontHeading,
+          fontSize: 18,
+          fontWeight: 400,
+          letterSpacing: "-0.3px",
+          color: "#111111"
+        }}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
+
 export function StartFlow() {
-  const [mode, setMode] = useState("just_listen");
-  const [product, setProduct] = useState("quick_call");
-  const [plan, setPlan] = useState("");
-  const [userLabel, setUserLabel] = useState("");
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [bid, setBid] = useState("0");
-  const [status, setStatus] = useState("");
-  const [error, setError] = useState("");
+  const router = useRouter();
+  const params = useSearchParams();
+  const auth = useAuth();
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setMode(params.get("mode") || "just_listen");
-    setProduct(params.get("product") || "quick_call");
-    setPlan(params.get("plan") || "");
-    return onFirebaseUserChanged((user) => {
-      setIsSignedIn(Boolean(user));
-      setUserLabel(user?.email || user?.displayName || "");
-    });
-  }, []);
+  const planParam = params.get("plan");
+  const membership = subscriptions.find((s) => s.id === planParam) ?? null;
+  const activated = params.get("activated") === "1";
 
-  const selectedProduct = useMemo(
-    () => oneOffs.find((item) => item.id === product),
-    [product]
+  const [mode, setMode] = useState<ModeId>(
+    isModeId(params.get("mode")) ? (params.get("mode") as ModeId) : "just_listen"
+  );
+  const [product, setProduct] = useState<OneOffId>(
+    isOneOffId(params.get("product")) ? (params.get("product") as OneOffId) : "quick_call"
   );
 
-  async function startOneOff() {
-    if (!isSignedIn) {
-      setError("Sign in with Firebase before checkout.");
-      return;
-    }
+  // Client-side navigations to /start?mode=… don't remount this component,
+  // so keep the selection in sync with the URL.
+  useEffect(() => {
+    const urlMode = params.get("mode");
+    if (isModeId(urlMode)) setMode(urlMode);
+    const urlProduct = params.get("product");
+    if (isOneOffId(urlProduct)) setProduct(urlProduct);
+  }, [params]);
+  const [bidCents, setBidCents] = useState(0);
+  const [customBid, setCustomBid] = useState(false);
+  const [customBidValue, setCustomBidValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const selected = useMemo(() => oneOffs.find((o) => o.id === product)!, [product]);
+  const effectiveBid = customBid
+    ? Math.max(0, Math.round(Number(customBidValue || "0") * 100))
+    : bidCents;
+  const totalCents = selected.amountCents + effectiveBid;
+
+  function ensureSignedIn(): boolean {
+    if (auth.signedIn) return true;
+    if (auth.signedIn === null) return false;
+    redirectToSignIn();
+    return false;
+  }
+
+  async function continueToPayment() {
     setError("");
-    setStatus("Creating checkout...");
+    setBusy(true);
     try {
+      if (!ensureSignedIn()) return;
       const response = await apiPost<CheckoutResponse>("/checkout/one-off", {
         mode,
         product,
-        priority_bid_cents: Math.max(0, Math.round(Number(bid || "0") * 100))
+        priority_bid_cents: effectiveBid
       });
       window.localStorage.setItem("ear:lastSessionId", response.session_id);
       window.location.href = response.checkout_url;
-    } catch (checkoutError) {
-      setStatus("");
-      setError(checkoutError instanceof Error ? checkoutError.message : "Checkout failed.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
     }
   }
 
-  async function handleGoogleSignIn() {
+  async function startMembership() {
+    if (!membership) return;
     setError("");
-    setStatus("Opening Firebase sign-in...");
+    setBusy(true);
     try {
-      const user = await signInWithGoogle();
-      if (!user) {
-        setStatus("Firebase web config is not installed yet.");
-        return;
-      }
-      setStatus(`Signed in as ${user.email || user.uid}.`);
-    } catch (authError) {
-      setStatus("");
-      setError(authError instanceof Error ? authError.message : "Firebase sign-in failed.");
-    }
-  }
-
-  async function startSubscription() {
-    if (!isSignedIn) {
-      setError("Sign in with Firebase before subscribing.");
-      return;
-    }
-    if (!plan) {
-      setError("Choose a subscription plan first.");
-      return;
-    }
-    setError("");
-    setStatus("Creating subscription checkout...");
-    try {
+      if (!ensureSignedIn()) return;
       const response = await apiPost<CheckoutResponse>("/checkout/subscription", {
-        plan
+        plan: membership.id
       });
       window.location.href = response.checkout_url;
-    } catch (checkoutError) {
-      setStatus("");
-      setError(checkoutError instanceof Error ? checkoutError.message : "Subscription failed.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
     }
   }
 
+  // Only show the Google label when we know for sure the user is signed out;
+  // while auth is still resolving (null) we show the real action.
+  const ctaLabel = busy
+    ? "One moment…"
+    : auth.signedIn === false
+      ? "Sign in to continue"
+      : membership
+        ? `Start ${membership.name} · ${membership.price}${membership.cadence}`
+        : `Continue to payment · ${dollars(totalCents)}`;
+
   return (
-    <section className="flow">
-      <div className="section-heading">
-        <p className="eyebrow">Start</p>
-        <h1>Pick your mode, then pay.</h1>
-        <p className="lede">
-          Sign-in is backed by Firebase. Payments are routed through Stripe. In
-          preview mode, missing provider secrets send you into the queue flow so
-          the product can still be tested.
-        </p>
-      </div>
+    <PageShell active="/start" maxWidth={820}>
+      <PageHero
+        eyebrow="Start"
+        title={membership ? "Almost there." : "Start a session."}
+        sub={
+          membership
+            ? "Confirm your membership and you're in."
+            : "Three choices. Under a minute. Then you're in line."
+        }
+      />
 
-      <div className="card">
-        <div className="form-grid">
-          <div className="status full">
-            Firebase Auth:{" "}
-            {isSignedIn
-              ? `signed in${userLabel ? ` as ${userLabel}` : ""}`
-              : firebaseConfigured
-                ? "ready, sign in to continue"
-                : "waiting for web app config"}
-            .
-          </div>
+      {activated ? (
+        <div className="flex justify-center" style={{ marginBottom: 28 }}>
+          <Note kind="success">Your membership is active. Welcome.</Note>
+        </div>
+      ) : null}
 
-          <label>
-            Mode
-            <select value={mode} onChange={(event) => setMode(event.target.value)}>
-              {modes.map((item) => (
-                <option value={item.id} key={item.id}>
-                  {item.name}
-                </option>
+      {membership ? (
+        /* ----- Membership confirmation ----- */
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <Surface style={{ padding: 34, maxWidth: 480, margin: "0 auto" }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: 6 }}>
+              <h3
+                style={{
+                  fontFamily: fontHeading,
+                  fontSize: 24,
+                  fontWeight: 400,
+                  letterSpacing: "-0.6px",
+                  color: "#111111",
+                  margin: 0
+                }}
+              >
+                {membership.name}
+              </h3>
+              <span>
+                <span
+                  style={{
+                    fontFamily: fontHeading,
+                    fontSize: 26,
+                    fontWeight: 300,
+                    letterSpacing: "-0.8px",
+                    color: "#111111"
+                  }}
+                >
+                  {membership.price}
+                </span>
+                <span style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.4)" }}>
+                  {membership.cadence}
+                </span>
+              </span>
+            </div>
+            <p style={{ fontFamily: fontBody, fontSize: 14, color: "rgba(0,0,0,0.55)", margin: "0 0 20px" }}>
+              {membership.tagline}
+            </p>
+            <ul style={{ listStyle: "none", margin: "0 0 26px", padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+              {membership.perks.map((perk) => (
+                <li key={perk} className="flex items-center" style={{ gap: 9 }}>
+                  <Check size={15} color="#1F9D63" strokeWidth={2.4} />
+                  <span style={{ fontFamily: fontBody, fontSize: 14, color: "rgba(0,0,0,0.65)" }}>{perk}</span>
+                </li>
               ))}
-            </select>
-          </label>
-
-          <label>
-            One-off
-            <select value={product} onChange={(event) => setProduct(event.target.value)}>
-              {oneOffs.map((item) => (
-                <option value={item.id} key={item.id}>
-                  {item.name} - {item.price}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label>
-            Priority bid
-            <input
-              inputMode="decimal"
-              value={bid}
-              onChange={(event) => setBid(event.target.value)}
-              placeholder="0"
-            />
-          </label>
-
-          <div className="status full">
-            {selectedProduct?.name}: {selectedProduct?.detail}. Higher bids move
-            ahead in the queue, with waiting-time bonus preventing starvation.
-          </div>
-        </div>
-
-        <div className="actions">
-          {isSignedIn ? (
-            <button type="button" className="secondary" onClick={signOutCurrentUser}>
-              Sign out
-            </button>
-          ) : (
-            <button type="button" className="secondary" onClick={handleGoogleSignIn}>
-              Sign in with Google
-            </button>
-          )}
-          <button type="button" onClick={startOneOff}>
-            Continue to Stripe
-          </button>
-          <a className="secondary" href="/queue">
-            I already paid
-          </a>
-        </div>
-      </div>
-
-      <section id="subscriptions">
-        <div className="section-heading">
-          <p className="eyebrow">Access</p>
-          <h2>Or subscribe for ongoing access.</h2>
-        </div>
-        <div className="grid">
-          {subscriptions.map((item) => (
-            <button
-              type="button"
-              className={`card clickable ${plan === item.id ? "selected" : ""}`}
-              onClick={() => setPlan(item.id)}
-              key={item.id}
+            </ul>
+            <MagneticButton
+              circleColor="rgba(255,255,255,0.15)"
+              circleSize={260}
+              onClick={startMembership}
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                borderRadius: 9999,
+                background: "#111111",
+                color: "#FFFFFF",
+                border: "none",
+                fontFamily: fontHeading,
+                fontSize: 15,
+                fontWeight: 500,
+                padding: "15px 28px",
+                cursor: busy ? "wait" : "pointer",
+                opacity: busy ? 0.7 : 1
+              }}
             >
-              <h3>{item.name}</h3>
-              <strong>{item.price}</strong>
-              <p>{item.detail}</p>
-            </button>
-          ))}
-        </div>
-        <div className="actions">
-          <button type="button" onClick={startSubscription}>
-            Subscribe with Stripe
-          </button>
-        </div>
-      </section>
+              {ctaLabel} {busy ? null : <ArrowRight size={15} />}
+            </MagneticButton>
+            <p style={{ textAlign: "center", margin: "16px 0 0" }}>
+              <Link
+                href="/pricing?view=membership"
+                style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}
+              >
+                Change plan
+              </Link>
+            </p>
+          </Surface>
+        </motion.div>
+      ) : (
+        /* ----- One-time session flow ----- */
+        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
+          {/* Step 1: mode */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
+          >
+            <StepLabel index="01">How do you want to connect?</StepLabel>
+            <div className="k-row">
+              {modes.map((m) => (
+                <Chip
+                  key={m.id}
+                  size="lg"
+                  label={m.name}
+                  selected={mode === m.id}
+                  onClick={() => setMode(m.id)}
+                  icon={<ModeGlyph mode={m.id} size={22} radius={7} />}
+                />
+              ))}
+            </div>
+            <p style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.4)", margin: "12px 0 0" }}>
+              {modes.find((m) => m.id === mode)?.description}
+            </p>
+          </motion.section>
 
-      {status ? <p className="status">{status}</p> : null}
-      {error ? <p className="status error">{error}</p> : null}
-    </section>
+          {/* Step 2: session */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.12, ease: "easeOut" }}
+          >
+            <StepLabel index="02">How long?</StepLabel>
+            <div className="k-grid k-grid-4">
+              {oneOffs.map((item) => {
+                const isSelected = product === item.id;
+                return (
+                  <Surface
+                    key={item.id}
+                    hover
+                    selected={isSelected}
+                    onClick={() => setProduct(item.id)}
+                    style={{ padding: 18, display: "flex", flexDirection: "column", gap: 10, width: "100%" }}
+                  >
+                    <div className="flex items-center" style={{ gap: 7 }}>
+                      {item.kind === "text" ? (
+                        <MessageSquareText size={14} color="rgba(0,0,0,0.4)" />
+                      ) : (
+                        <Phone size={14} color="rgba(0,0,0,0.4)" />
+                      )}
+                      <span style={{ fontFamily: fontBody, fontSize: 12, color: "rgba(0,0,0,0.5)" }}>
+                        {item.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center" style={{ gap: 7 }}>
+                      <Clock size={15} color="#E8642A" strokeWidth={1.9} />
+                      <span
+                        style={{
+                          fontFamily: fontHeading,
+                          fontSize: 21,
+                          fontWeight: 350,
+                          letterSpacing: "-0.6px",
+                          color: "#111111"
+                        }}
+                      >
+                        {item.duration}
+                      </span>
+                    </div>
+                    <span style={{ fontFamily: fontBody, fontSize: 14, fontWeight: 500, color: "#111111" }}>
+                      {item.price}
+                    </span>
+                  </Surface>
+                );
+              })}
+            </div>
+          </motion.section>
+
+          {/* Step 3: priority */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.19, ease: "easeOut" }}
+          >
+            <StepLabel index="03">Skip the line?</StepLabel>
+            <div className="k-row" style={{ alignItems: "center" }}>
+              {BID_OPTIONS.map((option) => (
+                <Chip
+                  key={option.cents}
+                  label={option.label}
+                  selected={!customBid && bidCents === option.cents}
+                  onClick={() => {
+                    setCustomBid(false);
+                    setBidCents(option.cents);
+                  }}
+                  icon={option.cents > 0 ? <Zap size={13} /> : undefined}
+                />
+              ))}
+              <Chip label="Custom" selected={customBid} onClick={() => setCustomBid(true)} />
+              {customBid ? (
+                <div
+                  className="inline-flex items-center"
+                  style={{
+                    gap: 4,
+                    height: 38,
+                    padding: "0 14px",
+                    borderRadius: 9999,
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    background: "rgba(255,255,255,0.9)"
+                  }}
+                >
+                  <span style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}>$</span>
+                  <input
+                    autoFocus
+                    inputMode="decimal"
+                    value={customBidValue}
+                    onChange={(e) => setCustomBidValue(e.target.value.replace(/[^0-9.]/g, ""))}
+                    placeholder="0"
+                    style={{
+                      width: 56,
+                      border: "none",
+                      outline: "none",
+                      background: "transparent",
+                      fontFamily: fontBody,
+                      fontSize: 14,
+                      color: "#111111"
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+            <p style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.4)", margin: "12px 0 0" }}>
+              A higher amount moves you up the queue. Waiting always counts too, so nobody waits forever.
+            </p>
+          </motion.section>
+
+          {/* Summary + CTA */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.26, ease: "easeOut" }}
+          >
+            <Surface style={{ padding: "22px 26px" }}>
+              <div
+                className="flex items-center justify-between"
+                style={{ flexWrap: "wrap", gap: 16 }}
+              >
+                <div>
+                  <p style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)", margin: "0 0 4px" }}>
+                    {modes.find((m) => m.id === mode)?.name} · {selected.name}
+                    {effectiveBid > 0 ? ` · priority ${dollars(effectiveBid)}` : ""}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: fontHeading,
+                      fontSize: 28,
+                      fontWeight: 300,
+                      letterSpacing: "-1px",
+                      color: "#111111",
+                      margin: 0
+                    }}
+                  >
+                    {dollars(totalCents)}
+                  </p>
+                </div>
+                <div className="flex items-center" style={{ gap: 12, flexWrap: "wrap" }}>
+                  {auth.signedIn && auth.label ? (
+                    <span
+                      className="inline-flex items-center"
+                      style={{ gap: 8, fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.5)" }}
+                    >
+                      {auth.label}
+                      <Link
+                        href="/account"
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          fontFamily: fontBody,
+                          fontSize: 13,
+                          color: "rgba(0,0,0,0.4)",
+                          textDecoration: "underline",
+                          cursor: "pointer",
+                          padding: 0
+                        }}
+                      >
+                        account
+                      </Link>
+                    </span>
+                  ) : null}
+                  <MagneticButton
+                    circleColor="rgba(255,255,255,0.15)"
+                    circleSize={240}
+                    onClick={continueToPayment}
+                    style={{
+                      borderRadius: 9999,
+                      background: "#111111",
+                      color: "#FFFFFF",
+                      border: "none",
+                      fontFamily: fontHeading,
+                      fontSize: 15,
+                      fontWeight: 500,
+                      padding: "14px 26px",
+                      cursor: busy ? "wait" : "pointer",
+                      opacity: busy ? 0.7 : 1
+                    }}
+                  >
+                    {ctaLabel} {busy ? null : <ArrowRight size={15} />}
+                  </MagneticButton>
+                </div>
+              </div>
+            </Surface>
+            <div className="flex items-center justify-between" style={{ marginTop: 16, flexWrap: "wrap", gap: 10 }}>
+              <Link
+                href="/pricing?view=membership"
+                style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}
+              >
+                Prefer ongoing access? See memberships →
+              </Link>
+              <Link href="/queue" style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}>
+                Already paid? Go to your queue →
+              </Link>
+            </div>
+          </motion.section>
+        </div>
+      )}
+
+      {error ? (
+        <div className="flex justify-center" style={{ marginTop: 28 }}>
+          <Note kind="error">{error}</Note>
+        </div>
+      ) : null}
+
+      <div style={{ height: 80 }} />
+    </PageShell>
   );
 }

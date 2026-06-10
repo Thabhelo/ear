@@ -1,10 +1,18 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import {
-  getAuth,
+  EmailAuthProvider,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  getAuth,
+  linkWithCredential,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updatePassword,
+  updateProfile,
   type Auth,
   type User
 } from "firebase/auth";
@@ -35,6 +43,19 @@ export function getFirebaseAuth(): Auth | null {
   return auth;
 }
 
+export function getUserProviders(user: User | null): string[] {
+  if (!user) return [];
+  return user.providerData.map((provider) => provider.providerId);
+}
+
+export function userHasPassword(user: User | null): boolean {
+  return getUserProviders(user).includes("password");
+}
+
+export function userUsesGoogle(user: User | null): boolean {
+  return getUserProviders(user).includes("google.com");
+}
+
 export function onFirebaseUserChanged(callback: (user: User | null) => void): () => void {
   const currentAuth = getFirebaseAuth();
   if (!currentAuth) {
@@ -42,6 +63,11 @@ export function onFirebaseUserChanged(callback: (user: User | null) => void): ()
     return () => undefined;
   }
   return onAuthStateChanged(currentAuth, callback);
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const currentAuth = getFirebaseAuth();
+  return currentAuth?.currentUser ?? null;
 }
 
 export async function getCurrentUserToken(): Promise<string | null> {
@@ -60,6 +86,68 @@ export async function signInWithGoogle(): Promise<User | null> {
   const provider = new GoogleAuthProvider();
   const credential = await signInWithPopup(currentAuth, provider);
   return credential.user;
+}
+
+export async function signInWithEmail(email: string, password: string): Promise<User> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("Sign-in isn't available right now.");
+  }
+  const credential = await signInWithEmailAndPassword(currentAuth, email.trim(), password);
+  return credential.user;
+}
+
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  displayName?: string
+): Promise<User> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("Sign-up isn't available right now.");
+  }
+  const credential = await createUserWithEmailAndPassword(
+    currentAuth,
+    email.trim(),
+    password
+  );
+  if (displayName?.trim()) {
+    await updateProfile(credential.user, { displayName: displayName.trim() });
+  }
+  return credential.user;
+}
+
+export async function sendPasswordReset(email: string): Promise<void> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("Password reset isn't available right now.");
+  }
+  await sendPasswordResetEmail(currentAuth, email.trim());
+}
+
+/** Lets a Google-only account add email/password sign-in. */
+export async function linkPasswordToAccount(email: string, password: string): Promise<void> {
+  const currentAuth = getFirebaseAuth();
+  const user = currentAuth?.currentUser;
+  if (!currentAuth || !user) {
+    throw new Error("Sign in first to add a password.");
+  }
+  const credential = EmailAuthProvider.credential(email.trim(), password);
+  await linkWithCredential(user, credential);
+}
+
+export async function changeAccountPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<void> {
+  const currentAuth = getFirebaseAuth();
+  const user = currentAuth?.currentUser;
+  if (!currentAuth || !user?.email) {
+    throw new Error("Sign in first to change your password.");
+  }
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user, credential);
+  await updatePassword(user, newPassword);
 }
 
 export async function signOutCurrentUser(): Promise<void> {

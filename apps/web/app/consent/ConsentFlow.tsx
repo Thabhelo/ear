@@ -1,91 +1,212 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import MagneticButton from "../components/landing/MagneticButton";
+import {
+  Note,
+  PageHero,
+  PageShell,
+  Surface,
+  fontBody,
+  fontHeading
+} from "../components/landing/PageShell";
 import { apiPost } from "../lib/api";
-import { onFirebaseUserChanged, signInWithGoogle } from "../lib/firebase";
+import { redirectToSignIn } from "../lib/authRedirects";
+import { useAuth } from "../lib/useAuth";
+
+function ConsentRow({
+  checked,
+  onToggle,
+  title,
+  detail
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={checked}
+      className="flex"
+      style={{
+        gap: 16,
+        width: "100%",
+        textAlign: "left",
+        padding: "18px 20px",
+        borderRadius: 18,
+        border: checked ? "1.5px solid #111111" : "1px solid rgba(0,0,0,0.1)",
+        background: checked ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.9)",
+        cursor: "pointer",
+        transition: "border-color 0.2s ease, background 0.2s ease"
+      }}
+    >
+      <span
+        className="flex items-center justify-center"
+        style={{
+          flexShrink: 0,
+          width: 26,
+          height: 26,
+          borderRadius: 9999,
+          marginTop: 2,
+          border: checked ? "none" : "1.5px solid rgba(0,0,0,0.25)",
+          background: checked ? "#111111" : "transparent",
+          transition: "background 0.2s ease"
+        }}
+      >
+        {checked ? <Check size={15} color="#FFFFFF" strokeWidth={3} /> : null}
+      </span>
+      <span>
+        <span
+          style={{
+            display: "block",
+            fontFamily: fontHeading,
+            fontSize: 16,
+            fontWeight: 450,
+            color: "#111111",
+            marginBottom: 4
+          }}
+        >
+          {title}
+        </span>
+        <span
+          style={{
+            display: "block",
+            fontFamily: fontBody,
+            fontSize: 13.5,
+            lineHeight: 1.6,
+            color: "rgba(0,0,0,0.55)"
+          }}
+        >
+          {detail}
+        </span>
+      </span>
+    </button>
+  );
+}
 
 export function ConsentFlow() {
+  const params = useSearchParams();
+  const auth = useAuth();
+
   const [sessionId, setSessionId] = useState("");
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [userLabel, setUserLabel] = useState("");
   const [recording, setRecording] = useState(false);
   const [terms, setTerms] = useState(false);
-  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const checkoutSession = params.get("session") || window.localStorage.getItem("ear:lastSessionId") || "";
-    setSessionId(checkoutSession);
-    return onFirebaseUserChanged((user) => {
-      setIsSignedIn(Boolean(user));
-      setUserLabel(user?.email || user?.displayName || "");
-    });
-  }, []);
+    const session =
+      params.get("session") || window.localStorage.getItem("ear:lastSessionId") || "";
+    setSessionId(session);
+  }, [params]);
 
-  async function submitConsent() {
-    if (!isSignedIn) {
-      setError("Sign in with Firebase before joining a call.");
-      return;
-    }
+  const ready = recording && terms;
+
+  function ensureSignedIn(): boolean {
+    if (auth.signedIn) return true;
+    if (auth.signedIn === null) return false;
+    redirectToSignIn();
+    return false;
+  }
+
+  async function agreeAndJoin() {
+    if (!ready) return;
     setError("");
-    setStatus("Recording consent...");
+    setBusy(true);
     try {
+      if (!ensureSignedIn()) return;
       await apiPost("/calls/consent", {
         session_id: sessionId,
         recording_consented: recording,
         terms_consented: terms
       });
       window.location.href = `/call?session=${sessionId}`;
-    } catch (consentError) {
-      setStatus("");
-      setError(consentError instanceof Error ? consentError.message : "Consent failed.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
-    <section className="flow">
-      <div className="section-heading">
-        <p className="eyebrow">Consent</p>
-        <h1>No consent, no call.</h1>
-        <p className="lede">
-          This call is recorded for safety, quality assurance, and dispute
-          resolution. By joining, you consent to being recorded.
-        </p>
-      </div>
+    <PageShell active="/queue" maxWidth={640}>
+      <PageHero
+        eyebrow="Before the call"
+        title="Two things first."
+        sub="These protect both people on the call. They're not fine print. They're the deal."
+      />
 
-      <div className="card form-grid">
-        <div className="status full">
-          {isSignedIn ? `Signed in${userLabel ? ` as ${userLabel}` : ""}.` : "Sign in to continue."}
-          {sessionId ? ` Session ${sessionId}.` : " No checkout session found yet."}
-        </div>
-        <label className="full checkbox">
-          <input
-            type="checkbox"
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Surface style={{ padding: 30, display: "flex", flexDirection: "column", gap: 14 }}>
+          <ConsentRow
             checked={recording}
-            onChange={(event) => setRecording(event.target.checked)}
+            onToggle={() => setRecording((v) => !v)}
+            title="This call is recorded"
+            detail="Recording is for safety, quality, and dispute resolution. By joining, you consent to being recorded. No consent, no call."
           />
-          I consent to call recording.
-        </label>
-        <label className="full checkbox">
-          <input type="checkbox" checked={terms} onChange={(event) => setTerms(event.target.checked)} />
-          I understand Ear is not dating, therapy, crisis counseling, medical
-          advice, or emergency services.
-        </label>
-        <div className="actions full">
-          {!isSignedIn ? (
-            <button type="button" className="secondary" onClick={signInWithGoogle}>
-              Sign in with Google
-            </button>
-          ) : null}
-          <button type="button" onClick={submitConsent}>
-            Join call room
-          </button>
-        </div>
-      </div>
+          <ConsentRow
+            checked={terms}
+            onToggle={() => setTerms((v) => !v)}
+            title="This is presence, not a service of last resort"
+            detail="Ear is not dating, therapy, medical advice, or crisis counseling, and it's not a substitute for emergency services. Either side can leave at any time."
+          />
 
-      {status ? <p className="status">{status}</p> : null}
-      {error ? <p className="status error">{error}</p> : null}
-    </section>
+          <div className="flex justify-center" style={{ marginTop: 12 }}>
+            <MagneticButton
+              circleColor="rgba(255,255,255,0.15)"
+              circleSize={240}
+              onClick={agreeAndJoin}
+              style={{
+                borderRadius: 9999,
+                background: ready ? "#111111" : "rgba(0,0,0,0.25)",
+                color: "#FFFFFF",
+                border: "none",
+                fontFamily: fontHeading,
+                fontSize: 15,
+                fontWeight: 500,
+                padding: "14px 28px",
+                cursor: ready ? (busy ? "wait" : "pointer") : "not-allowed",
+                opacity: busy ? 0.7 : 1,
+                transition: "background 0.25s ease"
+              }}
+            >
+              {busy ? "One moment…" : "Agree and join the call"}
+              {busy ? null : <ArrowRight size={15} />}
+            </MagneticButton>
+          </div>
+          {!ready ? (
+            <p
+              style={{
+                textAlign: "center",
+                fontFamily: fontBody,
+                fontSize: 12.5,
+                color: "rgba(0,0,0,0.4)",
+                margin: 0
+              }}
+            >
+              Tap both cards to continue.
+            </p>
+          ) : null}
+        </Surface>
+      </motion.div>
+
+      {error ? (
+        <div className="flex justify-center" style={{ marginTop: 24 }}>
+          <Note kind="error">{error}</Note>
+        </div>
+      ) : null}
+
+      <div style={{ height: 80 }} />
+    </PageShell>
   );
 }
