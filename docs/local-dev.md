@@ -14,6 +14,19 @@ Run the web app and API in **two terminals**. Use Python **3.12+** (3.13 recomme
 
 If you moved the repo (for example from `~/repos/ear` to `~/ear`), delete and recreate `apps/api/.venv` so scripts point at the correct path (old venvs break `pip`/`uvicorn` shebangs).
 
+If Turbopack still panics after config changes, clear the cache and retry:
+
+```bash
+rm -rf /Users/thabhelo/ear/apps/web/.next
+```
+
+Fallback dev server (webpack, no Turbopack):
+
+```bash
+cd /Users/thabhelo/ear/apps/web
+npm run dev:webpack -- -p 3100
+```
+
 ## Terminal 1 — Web (port 3100)
 
 From the repo root (`/Users/thabhelo/ear`):
