@@ -2,6 +2,8 @@ import { initializeApp, type FirebaseApp } from "firebase/app";
 import {
   EmailAuthProvider,
   GoogleAuthProvider,
+  applyActionCode,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   getAuth,
   linkWithCredential,
@@ -13,6 +15,7 @@ import {
   signOut,
   updatePassword,
   updateProfile,
+  verifyPasswordResetCode,
   type Auth,
   type User
 } from "firebase/auth";
@@ -123,6 +126,33 @@ export async function sendPasswordReset(email: string): Promise<void> {
     throw new Error("Password reset isn't available right now.");
   }
   await sendPasswordResetEmail(currentAuth, email.trim());
+}
+
+/** Checks a password-reset link's code and returns the account email. */
+export async function verifyResetCode(oobCode: string): Promise<string> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("Password reset isn't available right now.");
+  }
+  return verifyPasswordResetCode(currentAuth, oobCode);
+}
+
+/** Completes a password reset started from an emailed link. */
+export async function completePasswordReset(oobCode: string, newPassword: string): Promise<void> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("Password reset isn't available right now.");
+  }
+  await confirmPasswordReset(currentAuth, oobCode, newPassword);
+}
+
+/** Applies an emailed action code (email verification, email recovery). */
+export async function applyAuthActionCode(oobCode: string): Promise<void> {
+  const currentAuth = getFirebaseAuth();
+  if (!currentAuth) {
+    throw new Error("This action isn't available right now.");
+  }
+  await applyActionCode(currentAuth, oobCode);
 }
 
 /** Lets a Google-only account add email/password sign-in. */

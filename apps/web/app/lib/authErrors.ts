@@ -32,6 +32,10 @@ export function friendlyAuthError(error: unknown): string {
         return "That sign-in option isn't turned on yet. Try Google, or check back soon.";
       case "auth/network-request-failed":
         return "We couldn't reach Ear. Check your connection and try again.";
+      case "auth/expired-action-code":
+        return "This link has expired. Request a new one and try again.";
+      case "auth/invalid-action-code":
+        return "This link is no longer valid. It may have been used already. Request a new one.";
       default:
         break;
     }
