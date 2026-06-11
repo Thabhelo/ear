@@ -224,6 +224,24 @@ const HomeLanding = () => {
             </span>
           </motion.div>
 
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+            style={{
+              margin: "0 auto 14px",
+              fontFamily: "'Inter Tight', sans-serif",
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "lowercase",
+              color: "rgba(0,0,0,0.38)",
+              textAlign: "center"
+            }}
+          >
+            friendship-as-a-service
+          </motion.p>
+
           <h1
             className="r-hero-h1"
             style={{
@@ -511,7 +529,7 @@ const HomeLanding = () => {
             marginBottom: 40,
           }}
         >
-          One real human. Six ways to connect.
+          World's first friendship-as-a-service.
         </p>
         <div
           style={{
