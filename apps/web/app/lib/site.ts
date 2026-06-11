@@ -4,9 +4,11 @@ export const siteUrl =
 
 export const siteName = "Ear";
 
-export const siteTitle = "Ear — Someone real is listening.";
+export const siteTitle = "Ear. Someone real is listening.";
 
 export const siteDescription =
-  "Someone real who actually picks up. Real human presence on demand — calls, texts, and quiet company when you need it.";
+  "Someone real who actually picks up. Calls, texts, and quiet company when you need it.";
 
 export const siteTagline = "friendship-as-a-service";
+
+export const siteHeadline = "Someone real who actually picks up.";
