@@ -185,6 +185,24 @@ const HomeLanding = () => {
           className="r-hero-padtop relative flex flex-col items-center text-center"
           style={{ zIndex: 10, paddingTop: 130 }}
         >
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }}
+            style={{
+              margin: "0 auto 10px",
+              fontFamily: "'Inter Tight', sans-serif",
+              fontSize: 11,
+              fontWeight: 500,
+              letterSpacing: "0.12em",
+              textTransform: "lowercase",
+              color: "rgba(0,0,0,0.38)",
+              textAlign: "center"
+            }}
+          >
+            friendship-as-a-service
+          </motion.p>
+
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -223,24 +241,6 @@ const HomeLanding = () => {
               Someone real is listening
             </span>
           </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
-            style={{
-              margin: "0 auto 14px",
-              fontFamily: "'Inter Tight', sans-serif",
-              fontSize: 11,
-              fontWeight: 500,
-              letterSpacing: "0.12em",
-              textTransform: "lowercase",
-              color: "rgba(0,0,0,0.38)",
-              textAlign: "center"
-            }}
-          >
-            friendship-as-a-service
-          </motion.p>
 
           <h1
             className="r-hero-h1"
