@@ -102,6 +102,25 @@ const LandingFooter = () => {
               fontSize: 13,
               fontWeight: 300,
               color: "rgba(0,0,0,0.40)",
+              margin: "0 0 10px",
+            }}
+          >
+            San Francisco, CA ·{" "}
+            <a
+              href="mailto:admin@callsomeone.org"
+              style={{ color: "rgba(0,0,0,0.40)", textDecoration: "none" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(0,0,0,0.7)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(0,0,0,0.40)")}
+            >
+              admin@callsomeone.org
+            </a>
+          </p>
+          <p
+            style={{
+              fontFamily: "'Inter Tight', sans-serif",
+              fontSize: 13,
+              fontWeight: 300,
+              color: "rgba(0,0,0,0.40)",
               margin: 0,
             }}
           >
