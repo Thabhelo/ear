@@ -268,7 +268,7 @@ const HomeLanding = () => {
             transition={{ duration: 0.6, delay: 0.55, ease: "easeOut" }}
             className="r-hero-sub"
             style={{
-              maxWidth: 420,
+              maxWidth: 480,
               margin: "0 auto 32px",
               fontFamily: "'Inter Tight', sans-serif",
               fontSize: 15,
@@ -278,7 +278,9 @@ const HomeLanding = () => {
               textAlign: "center",
             }}
           >
-            Not schedule. Not explain. Not wait. Pick a mode and connect with a real human in minutes.
+            You know that feeling. Wanting one friend who is just yours. Someone you
+            can call without having to plan it in advance, without feeling like you are
+            bothering them.
           </motion.p>
 
           <motion.div
