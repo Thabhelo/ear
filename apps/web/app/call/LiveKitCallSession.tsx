@@ -3,11 +3,11 @@
 import {
   LiveKitRoom,
   RoomAudioRenderer,
-  useConnectionState,
   useLocalParticipant,
+  useRemoteParticipants,
   useRoomContext
 } from "@livekit/components-react";
-import { ConnectionState } from "livekit-client";
+import { DisconnectReason } from "livekit-client";
 import { Mic, MicOff } from "lucide-react";
 import { ReactNode, useEffect } from "react";
 import { fontBody } from "../components/landing/PageShell";
@@ -16,34 +16,33 @@ type LiveKitCallSessionProps = {
   token: string;
   serverUrl: string;
   onConnected?: () => void;
-  onDisconnected?: () => void;
+  onDisconnected?: (reason?: DisconnectReason) => void;
+  onError?: (error: Error) => void;
   children?: ReactNode;
 };
-
-function ConnectionBridge({
-  onConnected,
-  onDisconnected
-}: {
-  onConnected?: () => void;
-  onDisconnected?: () => void;
-}) {
-  const state = useConnectionState();
-
-  useEffect(() => {
-    if (state === ConnectionState.Connected) {
-      onConnected?.();
-    }
-    if (state === ConnectionState.Disconnected) {
-      onDisconnected?.();
-    }
-  }, [state, onConnected, onDisconnected]);
-
-  return null;
-}
 
 export function useDisconnectRoom() {
   const room = useRoomContext();
   return () => room.disconnect();
+}
+
+/**
+ * Reports how many remote participants are in the room, so the page can show
+ * a "waiting for the other person" state instead of treating a solo join as
+ * a failure. Must be rendered inside LiveKitCallSession.
+ */
+export function RemotePresenceBridge({
+  onChange
+}: {
+  onChange: (count: number) => void;
+}) {
+  const remoteParticipants = useRemoteParticipants();
+
+  useEffect(() => {
+    onChange(remoteParticipants.length);
+  }, [remoteParticipants.length, onChange]);
+
+  return null;
 }
 
 export function MuteToggle() {
@@ -78,6 +77,7 @@ export function LiveKitCallSession({
   serverUrl,
   onConnected,
   onDisconnected,
+  onError,
   children
 }: LiveKitCallSessionProps) {
   return (
@@ -88,9 +88,21 @@ export function LiveKitCallSession({
       audio
       video={false}
       options={{ adaptiveStream: true, dynacast: true }}
+      onConnected={onConnected}
+      onDisconnected={(reason) => {
+        // Surface the LiveKit disconnect reason for diagnostics.
+        console.info(
+          "[call] room disconnected:",
+          reason !== undefined ? DisconnectReason[reason] ?? reason : "unknown"
+        );
+        onDisconnected?.(reason);
+      }}
+      onError={(error) => {
+        console.error("[call] room error:", error);
+        onError?.(error);
+      }}
     >
       <RoomAudioRenderer />
-      <ConnectionBridge onConnected={onConnected} onDisconnected={onDisconnected} />
       {children}
     </LiveKitRoom>
   );

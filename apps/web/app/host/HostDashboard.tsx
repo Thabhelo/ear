@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { DisconnectReason } from "livekit-client";
 import { Gavel, Phone, RefreshCw, Users } from "lucide-react";
 import { useState } from "react";
 import { LiveKitCallSession, MuteToggle, useDisconnectRoom } from "../call/LiveKitCallSession";
@@ -243,11 +244,15 @@ export function HostDashboard() {
                     current ? { ...current, connection: "connected" } : current
                   )
                 }
-                onDisconnected={() =>
+                onDisconnected={(reason) => {
+                  if (reason === DisconnectReason.CLIENT_INITIATED) {
+                    setActiveCall(null);
+                    return;
+                  }
                   setActiveCall((current) =>
                     current ? { ...current, connection: "disconnected" } : current
-                  )
-                }
+                  );
+                }}
               >
                 <HostCallPanel call={activeCall} busy={callBusy} onLeave={leaveSession} />
               </LiveKitCallSession>

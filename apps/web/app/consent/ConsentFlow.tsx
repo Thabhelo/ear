@@ -126,6 +126,7 @@ export function ConsentFlow() {
         recording_consented: recording,
         terms_consented: terms
       });
+      window.localStorage.setItem("ear:consentAcknowledged", "1");
       window.location.href = `/call?session=${sessionId}`;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
