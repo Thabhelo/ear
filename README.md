@@ -42,8 +42,8 @@ See `docs/architecture.md` for the low-level system diagram and data model.
 
 This repository is a monorepo:
 
-- `apps/web`: Next.js frontend deployed as `pickup-web`.
-- `apps/api`: FastAPI backend deployed as `pickup-api`.
+- `apps/web`: Next.js frontend deployed as `callsomeone-web`.
+- `apps/api`: FastAPI backend deployed as `callsomeone-api`.
 - `docs`: product, architecture, and operating docs.
 - `infra`: local and cloud infrastructure notes.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Push LiveKit Cloud credentials to GCP Secret Manager for pickup-api.
+# Push LiveKit Cloud credentials to GCP Secret Manager for callsomeone-api.
 # Usage (do not commit these values):
 #   export LIVEKIT_URL=...
 #   export LIVEKIT_API_KEY=...
@@ -33,4 +33,4 @@ printf '%s' "$LIVEKIT_API_KEY" | gcloud secrets versions add livekit-api-key --d
 printf '%s' "$LIVEKIT_API_SECRET" | gcloud secrets versions add livekit-api-secret --data-file=- --project="$PROJECT_ID"
 
 echo "LiveKit secrets updated in project $PROJECT_ID (latest versions)."
-echo "Redeploy pickup-api so Cloud Run mounts the new secret versions."
+echo "Redeploy callsomeone-api so Cloud Run mounts the new secret versions."

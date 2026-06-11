@@ -23,6 +23,8 @@ __pycache__/
 dist/
 build/
 coverage/
+*.egg-info/
+*.tsbuildinfo
 
 # system
 .DS_Store

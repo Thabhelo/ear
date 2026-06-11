@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy API
         run: |
-          gcloud run deploy pickup-api \
+          gcloud run deploy callsomeone-api \
             --project="${GCP_PROJECT_ID}" \
             --region="${GCP_REGION}" \
             --source=apps/api \
@@ -46,7 +46,7 @@ jobs:
 
       - name: Deploy Web
         run: |
-          gcloud run deploy pickup-web \
+          gcloud run deploy callsomeone-web \
             --project="${GCP_PROJECT_ID}" \
             --region="${GCP_REGION}" \
             --source=apps/web \

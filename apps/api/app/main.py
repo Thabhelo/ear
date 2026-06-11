@@ -36,7 +36,7 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "pickup-api", "environment": settings.environment}
+    return {"status": "ok", "service": "callsomeone-api", "environment": settings.environment}
 
 
 @app.get("/catalog")

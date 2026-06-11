@@ -114,7 +114,7 @@ class CallsClient:
         )
 
     def _room_name(self, session_id: str) -> str:
-        return f"pickup-{session_id}"
+        return f"callsomeone-{session_id}"
 
     def _access_token(
         self,

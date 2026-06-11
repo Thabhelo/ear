@@ -1,5 +1,5 @@
 [project]
-name = "pickup-api"
+name = "callsomeone-api"
 version = "0.1.0"
 description = "FastAPI backend for Ear."
 requires-python = ">=3.12"

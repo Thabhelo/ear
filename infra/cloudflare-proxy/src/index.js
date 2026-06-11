@@ -1,5 +1,5 @@
 /**
- * Edge proxy: callsomeone.org -> Cloud Run (pickup-web / pickup-api).
+ * Edge proxy: callsomeone.org -> Cloud Run (callsomeone-web / callsomeone-api).
  * Cloud Run accepts the *.run.app Host header; browsers see callsomeone.org.
  */
 export default {

@@ -6,8 +6,8 @@ Project: `ear-thabhelo` (region: `us-central1`)
 
 | Service      | Image source                                      | LiveKit env |
 | ------------ | ------------------------------------------------- | ----------- |
-| `pickup-api` | Artifact Registry `cloud-run-source-deploy`       | Yes         |
-| `pickup-web` | Artifact Registry `cloud-run-source-deploy`       | No          |
+| `callsomeone-api` | Artifact Registry `cloud-run-source-deploy`  | Yes         |
+| `callsomeone-web` | Artifact Registry `cloud-run-source-deploy`  | No          |
 
 ## Secret Manager
 
@@ -20,7 +20,7 @@ export LIVEKIT_API_SECRET=...
 ./infra/scripts/set-livekit-secrets.sh ear-thabhelo
 ```
 
-| GCP secret name        | Cloud Run env (`pickup-api`) |
+| GCP secret name        | Cloud Run env (`callsomeone-api`) |
 | ---------------------- | ---------------------------- |
 | `livekit-url`          | `LIVEKIT_URL`                |
 | `livekit-api-key`      | `LIVEKIT_API_KEY`            |
@@ -33,7 +33,7 @@ The API reads these via Pydantic settings in `apps/api/app/settings.py` (`liveki
 After updating secrets, roll a new revision so instances pick up `latest`:
 
 ```bash
-gcloud run services update pickup-api \
+gcloud run services update callsomeone-api \
   --project=ear-thabhelo \
   --region=us-central1
 ```

@@ -4,8 +4,8 @@ Ear is designed to deploy on Google Cloud Run with managed external services.
 
 ## Services
 
-- `pickup-web`: Next.js frontend.
-- `pickup-api`: FastAPI backend.
+- `callsomeone-web`: Next.js frontend.
+- `callsomeone-api`: FastAPI backend.
 - Firebase Authentication for identity.
 - Cloud Firestore for application state.
 - Stripe for one-off payments, bids, subscriptions, and reinstatement review fees.
@@ -23,7 +23,7 @@ Ear is designed to deploy on Google Cloud Run with managed external services.
 
 ## LiveKit credentials
 
-See [cloud-run.md](./cloud-run.md) for Secret Manager secret names, the `set-livekit-secrets.sh` helper, and `pickup-api` env wiring.
+See [cloud-run.md](./cloud-run.md) for Secret Manager secret names, the `set-livekit-secrets.sh` helper, and `callsomeone-api` env wiring.
 
 ## GitHub Actions
 

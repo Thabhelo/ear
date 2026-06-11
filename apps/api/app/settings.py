@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     livekit_api_secret: str | None = None
     google_cloud_storage_bucket: str | None = None
     cloud_tasks_location: str = "us-central1"
-    cloud_tasks_queue: str = "pickup-session-jobs"
-    host_user_id: str = "pickup-host"
+    cloud_tasks_queue: str = "callsomeone-session-jobs"
+    host_user_id: str = "callsomeone-host"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

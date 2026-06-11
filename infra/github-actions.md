@@ -2,8 +2,8 @@
 
 Pushes to `main` run [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml), which redeploys:
 
-- `pickup-api` from `apps/api`
-- `pickup-web` from `apps/web`
+- `callsomeone-api` from `apps/api`
+- `callsomeone-web` from `apps/web`
 
 Both services deploy to Cloud Run in `ear-thabhelo` / `us-central1`.
 
@@ -41,8 +41,8 @@ No long-lived JSON keys are stored in GitHub. Authentication uses OIDC + Workloa
 ## Manual deploy (same as CI)
 
 ```bash
-gcloud run deploy pickup-api --project=ear-thabhelo --region=us-central1 --source=apps/api ...
-gcloud run deploy pickup-web --project=ear-thabhelo --region=us-central1 --source=apps/web ...
+gcloud run deploy callsomeone-api --project=ear-thabhelo --region=us-central1 --source=apps/api ...
+gcloud run deploy callsomeone-web --project=ear-thabhelo --region=us-central1 --source=apps/web ...
 ```
 
 See [cloud-run.md](./cloud-run.md) for Secret Manager details.
