@@ -59,11 +59,24 @@ export default function ForgotPasswordPage() {
                   lineHeight: 1.65,
                   color: "rgba(0,0,0,0.6)",
                   textAlign: "center",
-                  margin: "0 0 20px"
+                  margin: "0 0 16px"
                 }}
               >
                 If an account exists for <strong>{email}</strong>, we sent a reset link. Check your
                 inbox and spam folder.
+              </p>
+              <p
+                style={{
+                  fontFamily: fontBody,
+                  fontSize: 13,
+                  lineHeight: 1.65,
+                  color: "rgba(0,0,0,0.45)",
+                  textAlign: "center",
+                  margin: "0 0 20px"
+                }}
+              >
+                Signed up with Google? Those accounts don&apos;t have a password, so no email will
+                arrive. Just choose Continue with Google on the sign-in page.
               </p>
               <Note kind="success">Email sent</Note>
             </>
