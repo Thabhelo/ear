@@ -16,7 +16,7 @@ const columns = [
     title: "Get started",
     links: [
       { label: "Start a session", href: "/start" },
-      { label: "My queue", href: "/queue" },
+      { label: "Book a time", href: "/book" },
     ],
   },
   {
@@ -92,9 +92,9 @@ const LandingFooter = () => {
               marginBottom: 28,
             }}
           >
-            Someone real, whenever you need them. Pick a mode, join the queue,
-            and connect with a human who actually picks up. No scheduling, no
-            explaining, no waiting.
+            Someone real, whenever you need them. Pick a mode, book a time,
+            and connect with a human who actually picks up. No explaining, no
+            waiting around.
           </p>
           <p
             style={{

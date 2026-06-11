@@ -41,13 +41,13 @@ class StripeClient:
         if not self.configured:
             return {
                 "configured": False,
-                "checkout_url": f"{settings.app_base_url}/queue?session={session_id}&preview=1",
+                "checkout_url": f"{settings.app_base_url}/book?session={session_id}&preview=1",
                 "stripe_session_id": f"preview_{session_id}",
             }
 
         checkout = stripe.checkout.Session.create(
             mode="payment",
-            success_url=f"{settings.app_base_url}/queue?session={session_id}",
+            success_url=f"{settings.app_base_url}/book?session={session_id}",
             cancel_url=f"{settings.app_base_url}/start?cancelled=1",
             client_reference_id=session_id,
             metadata={"session_id": session_id, "product": product_key},

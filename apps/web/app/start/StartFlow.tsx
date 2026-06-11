@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Clock, MessageSquareText, Phone, Zap } from "lucide-react";
+import { ArrowRight, Check, Clock, MessageSquareText, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -26,13 +26,6 @@ type CheckoutResponse = {
   session_id: string;
   configured: boolean;
 };
-
-const BID_OPTIONS = [
-  { cents: 0, label: "No thanks" },
-  { cents: 200, label: "+$2" },
-  { cents: 500, label: "+$5" },
-  { cents: 1000, label: "+$10" }
-];
 
 function isModeId(value: string | null): value is ModeId {
   return modes.some((m) => m.id === value);
@@ -99,17 +92,11 @@ export function StartFlow() {
     const urlProduct = params.get("product");
     if (isOneOffId(urlProduct)) setProduct(urlProduct);
   }, [params]);
-  const [bidCents, setBidCents] = useState(0);
-  const [customBid, setCustomBid] = useState(false);
-  const [customBidValue, setCustomBidValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   const selected = useMemo(() => oneOffs.find((o) => o.id === product)!, [product]);
-  const effectiveBid = customBid
-    ? Math.max(0, Math.round(Number(customBidValue || "0") * 100))
-    : bidCents;
-  const totalCents = selected.amountCents + effectiveBid;
+  const totalCents = selected.amountCents;
 
   function ensureSignedIn(): boolean {
     if (auth.signedIn) return true;
@@ -126,7 +113,7 @@ export function StartFlow() {
       const response = await apiPost<CheckoutResponse>("/checkout/one-off", {
         mode,
         product,
-        priority_bid_cents: effectiveBid
+        priority_bid_cents: 0
       });
       window.localStorage.setItem("ear:lastSessionId", response.session_id);
       window.location.href = response.checkout_url;
@@ -172,7 +159,7 @@ export function StartFlow() {
         sub={
           membership
             ? "Confirm your membership and you're in."
-            : "Three choices. Under a minute. Then you're in line."
+            : "Three choices. Pay once, then pick a time that works for you."
         }
       />
 
@@ -340,64 +327,6 @@ export function StartFlow() {
             </div>
           </motion.section>
 
-          {/* Step 3: priority */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.19, ease: "easeOut" }}
-          >
-            <StepLabel index="03">Skip the line?</StepLabel>
-            <div className="k-row" style={{ alignItems: "center" }}>
-              {BID_OPTIONS.map((option) => (
-                <Chip
-                  key={option.cents}
-                  label={option.label}
-                  selected={!customBid && bidCents === option.cents}
-                  onClick={() => {
-                    setCustomBid(false);
-                    setBidCents(option.cents);
-                  }}
-                  icon={option.cents > 0 ? <Zap size={13} /> : undefined}
-                />
-              ))}
-              <Chip label="Custom" selected={customBid} onClick={() => setCustomBid(true)} />
-              {customBid ? (
-                <div
-                  className="inline-flex items-center"
-                  style={{
-                    gap: 4,
-                    height: 38,
-                    padding: "0 14px",
-                    borderRadius: 9999,
-                    border: "1px solid rgba(0,0,0,0.12)",
-                    background: "rgba(255,255,255,0.9)"
-                  }}
-                >
-                  <span style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}>$</span>
-                  <input
-                    autoFocus
-                    inputMode="decimal"
-                    value={customBidValue}
-                    onChange={(e) => setCustomBidValue(e.target.value.replace(/[^0-9.]/g, ""))}
-                    placeholder="0"
-                    style={{
-                      width: 56,
-                      border: "none",
-                      outline: "none",
-                      background: "transparent",
-                      fontFamily: fontBody,
-                      fontSize: 14,
-                      color: "#111111"
-                    }}
-                  />
-                </div>
-              ) : null}
-            </div>
-            <p style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.4)", margin: "12px 0 0" }}>
-              A higher amount moves you up the queue. Waiting always counts too, so nobody waits forever.
-            </p>
-          </motion.section>
-
           {/* Summary + CTA */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -412,7 +341,6 @@ export function StartFlow() {
                 <div>
                   <p style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)", margin: "0 0 4px" }}>
                     {modes.find((m) => m.id === mode)?.name} · {selected.name}
-                    {effectiveBid > 0 ? ` · priority ${dollars(effectiveBid)}` : ""}
                   </p>
                   <p
                     style={{
@@ -480,8 +408,8 @@ export function StartFlow() {
               >
                 Prefer ongoing access? See memberships →
               </Link>
-              <Link href="/queue" style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}>
-                Already paid? Go to your queue →
+              <Link href="/book" style={{ fontFamily: fontBody, fontSize: 13, color: "rgba(0,0,0,0.45)" }}>
+                Already paid? Book your time →
               </Link>
             </div>
           </motion.section>

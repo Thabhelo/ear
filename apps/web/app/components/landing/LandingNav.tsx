@@ -247,7 +247,7 @@ const LandingNav = ({ active }: { active?: string }) => {
             </div>
 
             <NavItem label="Pricing" href="/pricing" active={active === "/pricing"} />
-            <NavItem label="Queue" href="/queue" active={active === "/queue"} />
+            <NavItem label="Book" href="/book" active={active === "/book" || active === "/queue"} />
           </div>
         </div>
 
@@ -464,7 +464,7 @@ const LandingNav = ({ active }: { active?: string }) => {
         <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
         <Link href="/modes" onClick={() => setMobileOpen(false)}>Modes</Link>
         <Link href="/pricing" onClick={() => setMobileOpen(false)}>Pricing</Link>
-        <Link href="/queue" onClick={() => setMobileOpen(false)}>Queue</Link>
+        <Link href="/book" onClick={() => setMobileOpen(false)}>Book</Link>
         <Link href="/start" onClick={() => setMobileOpen(false)}>Start now</Link>
         {auth.signedIn === false ? (
           <>
