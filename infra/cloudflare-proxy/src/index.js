@@ -5,6 +5,14 @@
 export default {
   async fetch(request, env) {
     const incoming = new URL(request.url);
+
+    if (incoming.hostname === "www.callsomeone.org") {
+      const canonical = new URL(incoming);
+      canonical.hostname = "callsomeone.org";
+      canonical.protocol = "https:";
+      return Response.redirect(canonical.toString(), 301);
+    }
+
     const isApi = incoming.hostname === "api.callsomeone.org";
     const originHost = isApi ? env.API_ORIGIN : env.WEB_ORIGIN;
 
