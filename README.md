@@ -1,6 +1,6 @@
-# Ear
+# Ear(Intelligent Companion)
 
-Ear is an on-demand human presence platform.
+Ear is an on-demand human presence  platform.
 
 The product starts as a single-provider service: customers connect to Thabhelo through a platform identity, never through personal phone numbers, email, WhatsApp, Instagram, or other private accounts.
 
