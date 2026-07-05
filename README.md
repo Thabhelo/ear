@@ -1,4 +1,4 @@
-# Ear
+# Ear(Intelligent companion)
 
 Ear is an on-demand human presence platform.
 
