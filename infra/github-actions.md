@@ -1,11 +1,8 @@
 # GitHub Actions deploy
 
-Pushes to `main` run [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml), which redeploys:
+Pushes to `main` run [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml), which redeploys `callsomeone-web` from `apps/web` (the Next.js app serves the API under `/api`).
 
-- `callsomeone-api` from `apps/api`
-- `callsomeone-web` from `apps/web`
-
-Both services deploy to Cloud Run in `ear-thabhelo` / `us-central1`.
+The service deploys to Cloud Run in `ear-thabhelo` / `us-central1`.
 
 ## One-time setup
 
@@ -34,14 +31,11 @@ No long-lived JSON keys are stored in GitHub. Authentication uses OIDC + Workloa
 
 ## What gets deployed
 
-**API** uses `apps/api/.cloudrun.env.yaml` for plain env vars and Secret Manager for Stripe + LiveKit secrets (already configured on the service).
-
-**Web** uses `apps/web/.cloudrun.env.yaml` for runtime and build-time `NEXT_PUBLIC_*` Firebase/API URLs.
+**Web** uses `apps/web/.cloudrun.env.yaml` for build-time `NEXT_PUBLIC_*` Firebase config and runtime server settings (GCP project, storage bucket, Cloud Tasks), plus Secret Manager for Stripe + LiveKit secrets.
 
 ## Manual deploy (same as CI)
 
 ```bash
-gcloud run deploy callsomeone-api --project=ear-thabhelo --region=us-central1 --source=apps/api ...
 gcloud run deploy callsomeone-web --project=ear-thabhelo --region=us-central1 --source=apps/web ...
 ```
 

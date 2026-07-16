@@ -10,14 +10,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.21.0",
+    "@google-cloud/tasks": "^6.2.3",
     "@livekit/components-react": "^2.9.0",
     "firebase": "latest",
-    "livekit-client": "^2.9.0",
+    "firebase-admin": "^14.1.0",
     "framer-motion": "^12.40.0",
+    "livekit-client": "^2.9.0",
+    "livekit-server-sdk": "^2.17.0",
     "lucide-react": "^1.17.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "stripe": "^22.3.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "latest",

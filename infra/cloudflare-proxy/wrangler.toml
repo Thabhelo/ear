@@ -17,4 +17,3 @@ custom_domain = true
 
 [vars]
 WEB_ORIGIN = "callsomeone-web-963565155466.us-central1.run.app"
-API_ORIGIN = "callsomeone-api-963565155466.us-central1.run.app"
