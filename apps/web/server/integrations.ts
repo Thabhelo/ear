@@ -37,8 +37,29 @@ export const stripeClient = {
     return providerConfigured(settings.stripeSecretKey);
   },
 
+  get webhookConfigured(): boolean {
+    return providerConfigured(settings.stripeWebhookSecret);
+  },
+
   client(): Stripe {
     return new Stripe(settings.stripeSecretKey!);
+  },
+
+  /**
+   * Verifies the Stripe-Signature header against the raw request body.
+   * Throws if the signature is missing or invalid.
+   */
+  async verifyWebhook(rawBody: string, signature: string | null): Promise<Stripe.Event> {
+    if (!signature) {
+      throw new Error("Missing Stripe-Signature header.");
+    }
+    // Signature verification only needs the webhook secret, not the API key.
+    const stripe = new Stripe(settings.stripeSecretKey ?? "sk_unused");
+    return stripe.webhooks.constructEventAsync(
+      rawBody,
+      signature,
+      settings.stripeWebhookSecret!
+    );
   },
 
   async createOneOffCheckout(options: {
