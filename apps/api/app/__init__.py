@@ -1,1 +1,0 @@
-"""Ear API package."""

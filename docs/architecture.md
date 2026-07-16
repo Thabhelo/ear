@@ -8,7 +8,7 @@ flowchart TD
   Host[Thabhelo Host Console] --> Web
 
   Web --> Firebase[Firebase Authentication]
-  Web --> API[FastAPI Backend]
+  Web --> API[Next.js API Route Handlers]
 
   API --> Stripe[Stripe Payments and Billing]
   Stripe --> Webhook[Stripe Webhook Endpoint]
@@ -39,7 +39,7 @@ flowchart TD
 sequenceDiagram
   participant U as Customer
   participant W as Next.js Web
-  participant A as FastAPI
+  participant A as Next.js API (/api)
   participant S as Stripe
   participant Q as Queue
   participant C as LiveKit/Daily
@@ -221,7 +221,7 @@ erDiagram
 ## Infrastructure
 
 - Frontend: Next.js.
-- Backend: FastAPI.
+- Backend: Next.js route handlers (TypeScript) in the same app; business logic in `apps/web/server/`.
 - Auth: Firebase Authentication.
 - Database: Cloud Firestore.
 - Payments: Stripe.

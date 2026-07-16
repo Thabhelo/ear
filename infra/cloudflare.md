@@ -8,7 +8,7 @@ Production app stays on **Google Cloud Run**. Cloudflare sits in front with a sm
 | ---- | ------- |
 | `callsomeone.org` | `callsomeone-web` (Cloud Run) |
 | `www.callsomeone.org` | `callsomeone-web` (Cloud Run) |
-| `api.callsomeone.org` | `callsomeone-api` (Cloud Run) |
+| `api.callsomeone.org` | `callsomeone-web` (Cloud Run), path rewritten to `/api/*` (legacy host kept for pre-migration webhooks) |
 
 Worker code: [`infra/cloudflare-proxy/`](./cloudflare-proxy/)
 
@@ -65,10 +65,7 @@ In [Firebase Console → Authentication → Settings](https://console.firebase.g
 
 ### 6. Redeploy Cloud Run (GitHub Actions)
 
-Push to `main` so `callsomeone-web` and `callsomeone-api` pick up updated env in:
-
-- `apps/web/.cloudrun.env.yaml` → `NEXT_PUBLIC_API_BASE_URL=https://api.callsomeone.org`
-- `apps/api/.cloudrun.env.yaml` → `APP_BASE_URL`, `ALLOWED_ORIGINS`
+Push to `main` so `callsomeone-web` picks up updated env in `apps/web/.cloudrun.env.yaml` (`NEXT_PUBLIC_*` client config plus `APP_BASE_URL` and other server settings).
 
 ## Optional: native Cloud Run custom domains
 
@@ -77,7 +74,6 @@ Instead of the Worker proxy, you can map domains directly in GCP after verifying
 ```bash
 gcloud domains verify callsomeone.org
 gcloud beta run domain-mappings create --service=callsomeone-web --domain=callsomeone.org --region=us-central1 --project=ear-thabhelo
-gcloud beta run domain-mappings create --service=callsomeone-api --domain=api.callsomeone.org --region=us-central1 --project=ear-thabhelo
 ```
 
 Add the DNS records Google shows into Cloudflare. The Worker proxy is simpler and already handles SSL at the edge.

@@ -1,6 +1,10 @@
 /**
- * Edge proxy: callsomeone.org -> Cloud Run (callsomeone-web / callsomeone-api).
+ * Edge proxy: callsomeone.org -> Cloud Run (callsomeone-web).
  * Cloud Run accepts the *.run.app Host header; browsers see callsomeone.org.
+ *
+ * The API now lives inside the web app under /api. Requests to the legacy
+ * api.callsomeone.org host (e.g. Stripe webhooks configured before the
+ * migration) are rewritten to the web origin with an /api path prefix.
  */
 export default {
   async fetch(request, env) {
@@ -14,11 +18,14 @@ export default {
     }
 
     const isApi = incoming.hostname === "api.callsomeone.org";
-    const originHost = isApi ? env.API_ORIGIN : env.WEB_ORIGIN;
+    const originHost = env.WEB_ORIGIN;
 
     const target = new URL(incoming);
     target.protocol = "https:";
     target.hostname = originHost;
+    if (isApi && !target.pathname.startsWith("/api/")) {
+      target.pathname = `/api${target.pathname}`;
+    }
 
     const headers = new Headers(request.headers);
     headers.set("Host", originHost);

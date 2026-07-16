@@ -1,7 +1,7 @@
 import { getCurrentUserToken } from "./firebase";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+// The API is served by this same Next.js app under /api (route handlers).
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "/api";
 
 /** Maps HTTP failures to copy a caller should actually read. */
 function friendlyMessage(status: number): string {

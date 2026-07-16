@@ -42,9 +42,8 @@ See `docs/architecture.md` for the low-level system diagram and data model.
 
 This repository is a monorepo:
 
-- `apps/web`: Next.js frontend deployed as `callsomeone-web`.
-- `apps/api`: FastAPI backend deployed as `callsomeone-api`.
+- `apps/web`: Next.js app deployed as `callsomeone-web`. It serves both the frontend and the API (route handlers under `app/api/`, backend logic in `server/`).
 - `docs`: product, architecture, and operating docs.
 - `infra`: local and cloud infrastructure notes.
 
-See **[docs/local-dev.md](docs/local-dev.md)** for exact commands (ports 3100 / 8080), `.env` setup, and Firebase authorized domains.
+See **[docs/local-dev.md](docs/local-dev.md)** for exact commands (port 3100), `.env` setup, and Firebase authorized domains.
