@@ -16,7 +16,5 @@ export const settings = {
   livekitApiKey: process.env.LIVEKIT_API_KEY,
   livekitApiSecret: process.env.LIVEKIT_API_SECRET,
   googleCloudStorageBucket: process.env.GOOGLE_CLOUD_STORAGE_BUCKET,
-  cloudTasksLocation: process.env.CLOUD_TASKS_LOCATION ?? "us-central1",
-  cloudTasksQueue: process.env.CLOUD_TASKS_QUEUE ?? "callsomeone-session-jobs",
   hostUserId: process.env.HOST_USER_ID ?? "callsomeone-host"
 };

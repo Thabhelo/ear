@@ -1,9 +1,7 @@
 import { Storage } from "@google-cloud/storage";
-import { CloudTasksClient } from "@google-cloud/tasks";
 import { AccessToken, TrackSource, type VideoGrant } from "livekit-server-sdk";
 import Stripe from "stripe";
 import { settings } from "./settings";
-import { utcNow } from "./store";
 
 export const ONE_OFF_PRODUCTS = {
   text_once: { name: "Text once", amount_cents: 699, duration_minutes: 0, type: "text" },
@@ -232,37 +230,5 @@ export const storageClient = {
         contentType: "application/octet-stream"
       });
     return url;
-  }
-};
-
-export const tasksClient = {
-  get configured(): boolean {
-    return Boolean(settings.googleCloudProject && settings.cloudTasksQueue);
-  },
-
-  async enqueueSessionTimeout(options: {
-    sessionId: string;
-    delaySeconds: number;
-  }): Promise<{ configured: boolean; task_name: string | null }> {
-    const { sessionId, delaySeconds } = options;
-    if (!this.configured) return { configured: false, task_name: null };
-    const client = new CloudTasksClient();
-    const parent = client.queuePath(
-      settings.googleCloudProject!,
-      settings.cloudTasksLocation,
-      settings.cloudTasksQueue
-    );
-    const scheduleTime = new Date(utcNow().getTime() + delaySeconds * 1000);
-    const [created] = await client.createTask({
-      parent,
-      task: {
-        scheduleTime: { seconds: Math.floor(scheduleTime.getTime() / 1000) },
-        httpRequest: {
-          httpMethod: "POST",
-          url: `${settings.appBaseUrl}/api/internal/session-timeout/${sessionId}`
-        }
-      }
-    });
-    return { configured: true, task_name: created.name ?? null };
   }
 };

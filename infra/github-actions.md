@@ -31,7 +31,7 @@ No long-lived JSON keys are stored in GitHub. Authentication uses OIDC + Workloa
 
 ## What gets deployed
 
-**Web** uses `apps/web/.cloudrun.env.yaml` for build-time `NEXT_PUBLIC_*` Firebase config and runtime server settings (GCP project, storage bucket, Cloud Tasks), plus Secret Manager for Stripe + LiveKit secrets.
+**Web** uses `apps/web/.cloudrun.env.yaml` for build-time `NEXT_PUBLIC_*` Firebase config and runtime server settings (GCP project, storage bucket), plus Secret Manager for Stripe + LiveKit secrets.
 
 ## Manual deploy (same as CI)
 
