@@ -81,6 +81,21 @@ export async function getCurrentUserToken(): Promise<string | null> {
   return currentAuth.currentUser.getIdToken();
 }
 
+export type ClientRole = "user" | "host" | "admin";
+
+/** Reads role custom claims from the user's verified Firebase ID token. */
+export async function getUserRole(user: User | null): Promise<ClientRole> {
+  if (!user) return "user";
+  const { claims } = await user.getIdTokenResult();
+  if (claims.admin === true || claims.role === "admin") return "admin";
+  if (claims.host === true || claims.role === "host") return "host";
+
+  const roles = Array.isArray(claims.roles) ? claims.roles : [];
+  if (roles.includes("admin")) return "admin";
+  if (roles.includes("host")) return "host";
+  return "user";
+}
+
 export async function signInWithGoogle(): Promise<User | null> {
   const currentAuth = getFirebaseAuth();
   if (!currentAuth) {

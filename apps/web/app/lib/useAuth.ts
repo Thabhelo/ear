@@ -3,18 +3,22 @@
 import { useEffect, useState } from "react";
 import {
   getUserProviders,
+  getUserRole,
   onFirebaseUserChanged,
   signInWithEmail as firebaseSignInWithEmail,
   signInWithGoogle,
   signOutCurrentUser,
   signUpWithEmail as firebaseSignUpWithEmail,
   userHasPassword,
-  userUsesGoogle
+  userUsesGoogle,
+  type ClientRole
 } from "./firebase";
 
 export type AuthState = {
   /** null while the first auth check is still running */
   signedIn: boolean | null;
+  /** null while custom claims are loading */
+  role: ClientRole | null;
   label: string;
   email: string;
   photoUrl: string;
@@ -29,6 +33,7 @@ export type AuthState = {
 
 export function useAuth(): AuthState {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [role, setRole] = useState<ClientRole | null>(null);
   const [label, setLabel] = useState("");
   const [email, setEmail] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
@@ -39,6 +44,7 @@ export function useAuth(): AuthState {
   useEffect(() => {
     return onFirebaseUserChanged((user) => {
       setSignedIn(Boolean(user));
+      setRole(user ? null : "user");
       setLabel(user?.displayName || user?.email || "");
       setEmail(user?.email || "");
       setPhotoUrl(user?.photoURL || "");
@@ -46,6 +52,11 @@ export function useAuth(): AuthState {
       setProviders(nextProviders);
       setHasPassword(userHasPassword(user));
       setUsesGoogle(userUsesGoogle(user));
+      if (user) {
+        void getUserRole(user)
+          .then(setRole)
+          .catch(() => setRole("user"));
+      }
     });
   }, []);
 
@@ -70,6 +81,7 @@ export function useAuth(): AuthState {
 
   return {
     signedIn,
+    role,
     label,
     email,
     photoUrl,

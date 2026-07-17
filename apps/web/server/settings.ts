@@ -11,6 +11,7 @@ export const settings = {
   firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  recordingWebhookSecret: process.env.RECORDING_WEBHOOK_SECRET,
   appBaseUrl: process.env.APP_BASE_URL ?? "http://localhost:3000",
   livekitUrl: process.env.LIVEKIT_URL,
   livekitApiKey: process.env.LIVEKIT_API_KEY,

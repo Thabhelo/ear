@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireHost } from "@server/auth";
 import { apiRoute, parseBody } from "@server/http";
 import { callsClient } from "@server/integrations";
 import { hostJoinRoomRequest } from "@server/schemas";
@@ -7,6 +8,7 @@ import { settings } from "@server/settings";
 import { store, utcNow } from "@server/store";
 
 export const POST = apiRoute(async (request) => {
+  await requireHost(request);
   const payload = await parseBody(request, hostJoinRoomRequest);
   const session = await getSession(payload.session_id);
 

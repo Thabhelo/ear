@@ -47,3 +47,6 @@ This repository is a monorepo:
 - `infra`: local and cloud infrastructure notes.
 
 See **[docs/local-dev.md](docs/local-dev.md)** for exact commands (port 3100), `.env` setup, and Firebase authorized domains.
+
+See **[docs/api-authorization.md](docs/api-authorization.md)** for API access
+levels, Firebase host/admin role assignment, and recording webhook credentials.

@@ -11,7 +11,7 @@ export function AuthRedirectGate({
   children,
   fallback = "/"
 }: {
-  mode: "guest-only" | "signed-in-only";
+  mode: "guest-only" | "signed-in-only" | "host-only";
   children: ReactNode;
   fallback?: string;
 }) {
@@ -28,15 +28,25 @@ export function AuthRedirectGate({
       return;
     }
 
-    if (mode === "signed-in-only" && !auth.signedIn) {
+    if ((mode === "signed-in-only" || mode === "host-only") && !auth.signedIn) {
       const returnUrl = encodeURIComponent(
         typeof window !== "undefined" ? window.location.pathname : fallback
       );
       router.replace(`/sign-in?${RETURN_URL_PARAM}=${returnUrl}`);
+      return;
     }
-  }, [auth.signedIn, fallback, mode, params, router]);
 
-  if (auth.signedIn === null) {
+    if (
+      mode === "host-only" &&
+      auth.role !== null &&
+      auth.role !== "host" &&
+      auth.role !== "admin"
+    ) {
+      router.replace(fallback);
+    }
+  }, [auth.role, auth.signedIn, fallback, mode, params, router]);
+
+  if (auth.signedIn === null || (mode === "host-only" && auth.signedIn && auth.role === null)) {
     return null;
   }
 
@@ -44,7 +54,11 @@ export function AuthRedirectGate({
     return null;
   }
 
-  if (mode === "signed-in-only" && !auth.signedIn) {
+  if ((mode === "signed-in-only" || mode === "host-only") && !auth.signedIn) {
+    return null;
+  }
+
+  if (mode === "host-only" && auth.role !== "host" && auth.role !== "admin") {
     return null;
   }
 

@@ -62,7 +62,6 @@ export const recordingWebhookRequest = z.object({
 });
 
 export const messageCreate = z.object({
-  sender_id: z.string().min(1),
   receiver_id: z.string().min(1),
   session_id: z.string().nullish().default(null),
   content: z.string().min(1).max(5000)

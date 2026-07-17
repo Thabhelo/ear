@@ -45,4 +45,4 @@ jobs:
             --quiet \
             --env-vars-file=apps/web/.cloudrun.env.yaml \
             --build-env-vars-file=apps/web/.cloudrun.env.yaml \
-            --set-secrets=STRIPE_SECRET_KEY=stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=stripe-webhook-secret:latest,LIVEKIT_URL=livekit-url:latest,LIVEKIT_API_KEY=livekit-api-key:latest,LIVEKIT_API_SECRET=livekit-api-secret:latest
+            --set-secrets=STRIPE_SECRET_KEY=stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=stripe-webhook-secret:latest,RECORDING_WEBHOOK_SECRET=recording-webhook-secret:latest,LIVEKIT_URL=livekit-url:latest,LIVEKIT_API_KEY=livekit-api-key:latest,LIVEKIT_API_SECRET=livekit-api-secret:latest

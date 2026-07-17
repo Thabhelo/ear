@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+import { requireRecordingWebhook } from "@server/auth";
 import { apiRoute, parseBody } from "@server/http";
 import { storageClient } from "@server/integrations";
 import { recordingWebhookRequest } from "@server/schemas";
+import { getSession } from "@server/sessions";
 import { store, utcNow } from "@server/store";
 
 export const POST = apiRoute(async (request) => {
+  requireRecordingWebhook(request);
   const payload = await parseBody(request, recordingWebhookRequest);
+  await getSession(payload.session_id);
 
   const objectName = `recordings/${payload.session_id}/${payload.provider_recording_id || "upload"}.bin`;
   const signedUploadUrl = await storageClient.signedRecordingUrl(objectName);

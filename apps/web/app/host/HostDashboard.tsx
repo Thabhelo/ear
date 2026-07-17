@@ -218,7 +218,7 @@ export function HostDashboard() {
     });
 
   return (
-    <AuthRedirectGate mode="signed-in-only">
+    <AuthRedirectGate mode="host-only">
     <PageShell maxWidth={920}>
       <PageHero
         eyebrow="Host console"

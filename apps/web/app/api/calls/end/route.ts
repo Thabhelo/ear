@@ -13,7 +13,7 @@ export const POST = apiRoute(async (request) => {
   await store.update("sessions", payload.session_id, {
     status: "ended",
     ended_at: utcNow(),
-    ended_by: payload.ended_by,
+    ended_by: "user",
     end_reason: payload.reason,
     refund_requested: payload.refund_requested
   });
