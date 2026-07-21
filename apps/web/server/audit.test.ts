@@ -16,13 +16,13 @@ describe("auditPaymentWebhookReceived", () => {
 
     expect(result.level).toBe("info");
     expect(result.component).toBe("payment-webhook");
-    expect(result.audit_event_type).toBe(
+    expect(result.auditEventType).toBe(
       "payment_webhook_received",
     );
 
-    expect(result.session_id).toBe("session-123");
-    expect(result.stripe_event_id).toBe("evt-456");
-    expect(result.stripe_event_type).toBe(
+    expect(result.sessionId).toBe("session-123");
+    expect(result.stripeEventId).toBe("evt-456");
+    expect(result.stripeEventType).toBe(
       "checkout.session.completed",
     );
 

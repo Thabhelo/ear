@@ -9,10 +9,10 @@ type PaymentWebHookAuditRecord={
     correlationId: string;
     level: "info";
     component:"payment-webhook";
-    audit_event_type: "payment_webhook_received ";
-    session_id:string | null;
-    stripe_event_id:string | null;
-    stripe_event_type:string | null;
+    auditEventType: "payment_webhook_received";
+    sessionId:string | null;
+    stripeEventId:string | null;
+    stripeEventType:string | null;
 };
 export function auditPaymentWebHookReceived(
     input:PaymentWebHookAuditInput,):
@@ -22,10 +22,10 @@ export function auditPaymentWebHookReceived(
     correlationId:crypto.randomUUID(),
     level: "info",
     component:"payment-webhook",
-    audit_event_type : "payment_webhook_received",
-    session_id: input.sessionId ?? null,
-    stripe_event_id: input.stripeEventId ?? null,
-    stripe_event_type: input.stripeEventType ?? null,
+    auditEventType: "payment_webhook_received",
+    sessionId: input.sessionId ?? null,
+    stripeEventId: input.stripeEventId ?? null,
+    stripeEventType: input.stripeEventType ?? null,
   };
  console.info(JSON.stringify(auditRecord));
  return auditRecord;
