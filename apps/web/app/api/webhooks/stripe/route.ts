@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { HttpError, apiRoute } from "@server/http";
 import { stripeClient } from "@server/integrations";
 import { store } from "@server/store";
+import { auditPaymentWebHookReceived } from "@server/audit";    
 
 export const POST = apiRoute(async (request) => {
   const rawBody = await request.text();
@@ -29,6 +30,10 @@ export const POST = apiRoute(async (request) => {
 
   const data = payload.data as { object?: { client_reference_id?: string } } | undefined;
   const sessionId = data?.object?.client_reference_id;
+  const stripeEventId = payload.id as string | undefined;
+  const stripeEventType = payload.type as string | undefined;
+
+  auditPaymentWebHookReceived({ sessionId, stripeEventId, stripeEventType });
   if (sessionId) {
     await store.update("sessions", sessionId, { status: "paid" });
   }
