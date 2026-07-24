@@ -4,6 +4,7 @@ import { apiRoute, parseBody } from "@server/http";
 import { queueJoinRequest } from "@server/schemas";
 import { getOwnedSession } from "@server/sessions";
 import { store } from "@server/store";
+import { auditQueueEntryCreated } from "@server/audit";   
 
 export const POST = apiRoute(async (request) => {
   const userId = await currentUserId(request);
@@ -18,8 +19,14 @@ export const POST = apiRoute(async (request) => {
     mode: session.mode,
     priority_bid_cents: payload.priority_bid_cents,
     waiting_time_bonus: waitingTimeBonus,
-    priority_score: priorityScore,
+    priority_score: priorityScore,    
     status: "queued"
+  });
+  auditQueueEntryCreated({
+    sessionId: payload.session_id,
+    userId: userId,
+    queueEntryId: queueEntry.id,
+    priorityScore: priorityScore
   });
   await store.update("sessions", payload.session_id, { status: "queued" });
   return NextResponse.json({ status: "queued", queue_entry: queueEntry }, { status: 201 });

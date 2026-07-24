@@ -30,3 +30,38 @@ export function auditPaymentWebHookReceived(
  console.info(JSON.stringify(auditRecord));
  return auditRecord;
  }
+
+type QueueEntryCreatedAuditInput={
+    sessionId?:string,
+    userId?:string,
+    queueEntryId?:string,
+    priorityScore?:number,
+}
+type QueueEntryCreatedAuditRecord={
+    timestamp: string;
+    correlationId: string;
+    level: "info";
+    component:"queue";
+    auditEventType: "queue_entry_created";
+    sessionId:string | null;
+    userId:string | null;
+    queueEntryId:string | null;
+    priorityScore:number | null;
+};
+export function auditQueueEntryCreated(
+    input:QueueEntryCreatedAuditInput,):
+    QueueEntryCreatedAuditRecord{
+    const auditRecord: QueueEntryCreatedAuditRecord={   
+    timestamp:new Date().toISOString(),
+    correlationId:crypto.randomUUID(),
+    level: "info",
+    component:"queue",  
+    auditEventType: "queue_entry_created",
+    sessionId: input.sessionId ?? null,
+    userId: input.userId ?? null,
+    queueEntryId: input.queueEntryId ?? null,
+    priorityScore: input.priorityScore ?? null,
+  };
+ console.info(JSON.stringify(auditRecord));
+ return auditRecord;
+ }
